@@ -12,12 +12,8 @@ export default () => {
 
     const audioElm = document.getElementById("audio");
     const $output = $(".output");
-    const canvasElm = document.getElementById("canvas");
-    const canvasContext = canvasElm.getContext("2d");
+    const stageElm = document.querySelector('[data-js-stage]');
     let timeDomainData;
-
-    canvasElm.width = width;
-    canvasElm.height = height;
 
     if(navigator.getUserMedia) {
       navigator.getUserMedia(
@@ -33,7 +29,16 @@ export default () => {
           timeDomainData = new Uint8Array(analyser.frequencyBinCount);
           mediastreamsource.connect(analyser);
 
-          const animation = () => {
+          let time = 0;
+
+          const ticker = () => {
+            time++;
+
+            if (time % 10 !== 0) {
+              requestAnimationFrame(ticker);
+              return;
+            }
+
             analyser.getByteFrequencyData(frequencyData);
             analyser.getByteTimeDomainData(timeDomainData);
 
@@ -44,9 +49,12 @@ export default () => {
             const hue = mod(octave, 1) * 360;
             // ns.currentHue = hue;
 
-            canvasContext.clearRect(0, 0, width, height);
-            canvasContext.strokeStyle = tinycolor({ h: hue, s: 100, v: 100 }).toRgbString();
-            canvasContext.beginPath();
+            let xTmp;
+            let yTmp;
+
+            let linesTxt = '';
+
+            stageElm.innerHTML = '';
 
             for (let i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
               let hilbTmp = 0;
@@ -55,14 +63,21 @@ export default () => {
               }
               const x = width/2 + amp * normalize(timeDomainData[i]);
               const y = height/2 - amp * hilbTmp;
-              canvasContext.lineTo(x, y);
-            }
-            canvasContext.stroke();
 
-            requestAnimationFrame(animation);
+              if (xTmp != null && yTmp != null) {
+                linesTxt += `<line x1="${xTmp}" y1="${yTmp}" x2="${x}" y2="${y}" stroke="#000"></line>`;
+              }
+
+              xTmp = x;
+              yTmp = y;
+            }
+
+            stageElm.innerHTML = linesTxt;
+
+            requestAnimationFrame(ticker);
           };
 
-          animation();
+          ticker();
 
         },
         (err) => {

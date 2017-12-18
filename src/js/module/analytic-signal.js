@@ -32,19 +32,6 @@ export default class AnalyticSignal {
   }
 
   draw(hue) {
-    const canvasContext = this.$canvas.get(0).getContext("2d");
-
-    canvasContext.clearRect(0, 0, width, height);
-    canvasContext.strokeStyle = tinycolor({ h: (hue || 0), s: 100, v: 100 }).toRgbString();
-    canvasContext.beginPath();
-
-    const len = this.reArr.length;
-    for (let i = 0; i < len; i++) {
-      const x = width / 2 + amp * this.reArr[i];
-      const y = height / 2 - amp * this.imArr[i];
-      canvasContext.lineTo(x, y);
-    }
-    canvasContext.stroke();
   };
 
   play() {
