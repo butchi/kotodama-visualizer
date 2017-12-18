@@ -5,7 +5,7 @@ import { inv, normalize } from './util';
 export default class AnalyticSignal {
   constructor(arr) {
     this.origArr = new Uint8Array(arr.length);
-    for (var n = 0; n < arr.length; n++) {
+    for (let n = 0; n < arr.length; n++) {
       this.origArr[n] = arr[n];
     }
 
@@ -16,13 +16,13 @@ export default class AnalyticSignal {
 
     this.vol = 0;
 
-    for (var i = kernelLen, l = arr.length - kernelLen; i < l; i++) {
-      var hilbTmp = 0;
+    for (let i = kernelLen, l = arr.length - kernelLen; i < l; i++) {
+      let hilbTmp = 0;
       for (var k = -kernelLen; k <= kernelLen; k++) {
         hilbTmp += inv(k) * (normalize(arr[i + k]) || 0);
       }
-      var reVal = normalize(arr[i]);
-      var imVal = hilbTmp;
+      const reVal = normalize(arr[i]);
+      const imVal = hilbTmp;
 
       this.reArr.push(reVal);
       this.imArr.push(imVal);
@@ -32,17 +32,16 @@ export default class AnalyticSignal {
   }
 
   draw(hue) {
-    var canvasContext = this.$canvas.get(0).getContext("2d");
+    const canvasContext = this.$canvas.get(0).getContext("2d");
 
     canvasContext.clearRect(0, 0, width, height);
     canvasContext.strokeStyle = tinycolor({ h: (hue || 0), s: 100, v: 100 }).toRgbString();
     canvasContext.beginPath();
 
-    var len = this.reArr.length;
-    for (var i = 0; i < len; i++) {
-      var x, y;
-      x = width/2 + amp * this.reArr[i];
-      y = height/2 - amp * this.imArr[i];
+    const len = this.reArr.length;
+    for (let i = 0; i < len; i++) {
+      const x = width / 2 + amp * this.reArr[i];
+      const y = height / 2 - amp * this.imArr[i];
       canvasContext.lineTo(x, y);
     }
     canvasContext.stroke();
@@ -50,14 +49,13 @@ export default class AnalyticSignal {
 
   play() {
     //Create the instance of AudioBuffer (Synchronously)
-    var context = new AudioContext();
-    var audioBuffer = context.createBuffer(1, 1024, context.sampleRate);
+    const context = new AudioContext();
+    const audioBuffer = context.createBuffer(1, 1024, context.sampleRate);
     // var audioBuffer = context.createBuffer(channel, length, context.sampleRate);
 
-    var data = audioBuffer.getChannelData(0);
-    var i;
-    for(i=0; i<this.origArr.length; i++) {
-      data[i] = (this.origArr[i]-128)/128;
+    const data = audioBuffer.getChannelData(0);
+    for(let i = 0; i < this.origArr.length; i++) {
+      data[i] = (this.origArr[i] - 128) / 128;
     }
 
     //Create the instance of AudioBufferSourceNode

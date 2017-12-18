@@ -10,11 +10,11 @@ export default () => {
 
   const initialize = () => {
 
-    var audioElm = document.getElementById("audio");
-    var $output = $(".output");
-    var canvasElm = document.getElementById("canvas");
-    var canvasContext = canvasElm.getContext("2d");
-    var timeDomainData;
+    const audioElm = document.getElementById("audio");
+    const $output = $(".output");
+    const canvasElm = document.getElementById("canvas");
+    const canvasContext = canvasElm.getContext("2d");
+    let timeDomainData;
 
     canvasElm.width = width;
     canvasElm.height = height;
@@ -23,13 +23,13 @@ export default () => {
       navigator.getUserMedia(
         {audio : true},
         (stream) => {
-          var url = URL.createObjectURL(stream);
+          const url = URL.createObjectURL(stream);
           audioElm.src = url;
           audioElm.volume = 0;
-          var audioContext = new AudioContext();
-          var mediastreamsource = audioContext.createMediaStreamSource(stream);
-          var analyser = audioContext.createAnalyser();
-          var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+          const audioContext = new AudioContext();
+          const mediastreamsource = audioContext.createMediaStreamSource(stream);
+          const analyser = audioContext.createAnalyser();
+          const frequencyData = new Uint8Array(analyser.frequencyBinCount);
           timeDomainData = new Uint8Array(analyser.frequencyBinCount);
           mediastreamsource.connect(analyser);
 
@@ -37,25 +37,24 @@ export default () => {
             analyser.getByteFrequencyData(frequencyData);
             analyser.getByteTimeDomainData(timeDomainData);
 
-            var hzUnit = audioContext.sampleRate / analyser.fftSize; // frequencyData 1つあたりの周波数
-            var hz = maxIndexOf(frequencyData) * hzUnit;
-            var baseHz = 243; // C4
-            var octave = Math.log(hz/baseHz) / Math.log(2);
-            var hue = mod(octave, 1) * 360;
+            const hzUnit = audioContext.sampleRate / analyser.fftSize; // frequencyData 1つあたりの周波数
+            const hz = maxIndexOf(frequencyData) * hzUnit;
+            const baseHz = 243; // C4
+            const octave = Math.log(hz/baseHz) / Math.log(2);
+            const hue = mod(octave, 1) * 360;
             // ns.currentHue = hue;
 
-            var i, k;
             canvasContext.clearRect(0, 0, width, height);
             canvasContext.strokeStyle = tinycolor({ h: hue, s: 100, v: 100 }).toRgbString();
             canvasContext.beginPath();
 
-            for (var i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
-              var hilbTmp = 0;
-              for(k = -kernelLen; k <= kernelLen; k++) {
+            for (let i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
+              let hilbTmp = 0;
+              for(let k = -kernelLen; k <= kernelLen; k++) {
                 hilbTmp += inv(k) * (normalize(timeDomainData[i + k]) || 0);
               }
-              var x = width/2 + amp * normalize(timeDomainData[i]);
-              var y = height/2 - amp * hilbTmp;
+              const x = width/2 + amp * normalize(timeDomainData[i]);
+              const y = height/2 - amp * hilbTmp;
               canvasContext.lineTo(x, y);
             }
             canvasContext.stroke();
