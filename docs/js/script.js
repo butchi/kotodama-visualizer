@@ -220,7 +220,7 @@ var Router = function () {
 exports.default = Router;
 
 },{"../page/common":7,"../page/index":8,"../page/sub":9,"./ns":4}],6:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -244,6 +244,29 @@ var maxIndexOf = exports.maxIndexOf = function maxIndexOf(arr) {
 // from http://shnya.jp/blog/?p=323
 var mod = exports.mod = function mod(i, j) {
   return i % j + (i < 0 ? j : 0);
+};
+
+var generateLines = exports.generateLines = function generateLines(ptArr) {
+  return ptArr.reduce(function (txt, pt, i, arr) {
+    if (i > 0) {
+      var prevPt = arr[i - 1];
+      return txt + ('<line x1="' + prevPt.x + '" y1="' + prevPt.y + '" x2="' + pt.x + '" y2="' + pt.y + '" stroke="#000"></line>');
+    }
+
+    return '';
+  });
+};
+
+var generateCircles = exports.generateCircles = function generateCircles(ptArr) {
+  return ptArr.reduce(function (txt, pt) {
+    return txt + ('<circle cx="' + pt.x + '" cy="' + pt.y + '" r="1" fill="#000"></circle>');
+  }, '');
+};
+
+var generatePolylinePoints = exports.generatePolylinePoints = function generatePolylinePoints(ptArr) {
+  return ptArr.reduce(function (txt, pt) {
+    return txt + (pt.x + ' ' + pt.y + ' ');
+  }, '');
 };
 
 },{}],7:[function(require,module,exports){
@@ -312,8 +335,13 @@ exports.default = function () {
   var initialize = function initialize() {
 
     var audioElm = document.getElementById("audio");
-    var $output = $(".output");
     var stageElm = document.querySelector('[data-js-stage]');
+    var damaElm = document.querySelector('[data-js-dama]');
+    var playerElm = document.querySelector('[data-js-player]');
+    var $btnCapture = $('[data-js-btn-capture]');
+
+    var historyArr = [];
+
     var timeDomainData = void 0;
 
     if (navigator.getUserMedia) {
@@ -333,6 +361,7 @@ exports.default = function () {
         var ticker = function ticker() {
           time++;
 
+          // 間引き処理
           if (time % 10 !== 0) {
             requestAnimationFrame(ticker);
             return;
@@ -351,7 +380,7 @@ exports.default = function () {
           var xTmp = void 0;
           var yTmp = void 0;
 
-          var linesTxt = '';
+          var ptArr = _ns2.default.ptArr = [];
 
           stageElm.innerHTML = '';
 
@@ -363,15 +392,12 @@ exports.default = function () {
             var x = _config.width / 2 + _config.amp * (0, _util.normalize)(timeDomainData[i]);
             var y = _config.height / 2 - _config.amp * hilbTmp;
 
-            if (xTmp != null && yTmp != null) {
-              linesTxt += '<line x1="' + xTmp + '" y1="' + yTmp + '" x2="' + x + '" y2="' + y + '" stroke="#000"></line>';
-            }
-
-            xTmp = x;
-            yTmp = y;
+            _ns2.default.ptArr.push({ x: x, y: y });
           }
 
-          stageElm.innerHTML = linesTxt;
+          var polylinePointsTxt = (0, _util.generatePolylinePoints)(ptArr);
+
+          stageElm.innerHTML = '<g>\n  <polyline points="' + polylinePointsTxt + '" stroke="#000" fill="none"></polyline>\n</g>';
 
           requestAnimationFrame(ticker);
         };
@@ -383,6 +409,23 @@ exports.default = function () {
     } else {
       console.log("getUserMedia not supported");
     }
+
+    $btnCapture.on('click', function (_evt) {
+      historyArr.push(_ns2.default.ptArr);
+
+      var ptArr = _.last(historyArr);
+
+      damaElm.innerHTML = '';
+
+      var xTmp = void 0;
+      var yTmp = void 0;
+
+      var linesTxt = (0, _util.generateLines)(ptArr);
+      var circlesTxt = (0, _util.generateCircles)(ptArr);
+      var polylinePointsTxt = (0, _util.generatePolylinePoints)(ptArr);
+
+      damaElm.innerHTML = '<g>\n  <polyline points="' + polylinePointsTxt + '" stroke="#000" fill="none"></polyline>\n</g>\n<g>\n  ' + circlesTxt + '\n</g>';
+    });
   };
 
   window.addEventListener("load", initialize, false);
