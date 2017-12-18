@@ -1,6 +1,6 @@
 import ns from '../module/ns';
 import { kernelLen, amp, width, height } from '../module/config';
-import { inv, normalize, maxIndexOf, mod } from '../module/util';
+import { inv, normalize, maxIndexOf, mod, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
 import AnalyticSignal from '../module/analytic-signal';
 
 export default () => {
@@ -11,8 +11,13 @@ export default () => {
   const initialize = () => {
 
     const audioElm = document.getElementById("audio");
-    const $output = $(".output");
     const stageElm = document.querySelector('[data-js-stage]');
+    const damaElm = document.querySelector('[data-js-dama]');
+    const playerElm = document.querySelector('[data-js-player]');
+    const $btnCapture = $('[data-js-btn-capture]');
+
+    const historyArr = [];
+
     let timeDomainData;
 
     if(navigator.getUserMedia) {
@@ -34,6 +39,7 @@ export default () => {
           const ticker = () => {
             time++;
 
+            // 間引き処理
             if (time % 10 !== 0) {
               requestAnimationFrame(ticker);
               return;
@@ -52,7 +58,7 @@ export default () => {
             let xTmp;
             let yTmp;
 
-            let linesTxt = '';
+            const ptArr = ns.ptArr = [];
 
             stageElm.innerHTML = '';
 
@@ -64,21 +70,19 @@ export default () => {
               const x = width/2 + amp * normalize(timeDomainData[i]);
               const y = height/2 - amp * hilbTmp;
 
-              if (xTmp != null && yTmp != null) {
-                linesTxt += `<line x1="${xTmp}" y1="${yTmp}" x2="${x}" y2="${y}" stroke="#000"></line>`;
-              }
-
-              xTmp = x;
-              yTmp = y;
+              ns.ptArr.push({x, y});
             }
 
-            stageElm.innerHTML = linesTxt;
+            const polylinePointsTxt = generatePolylinePoints(ptArr);
+
+            stageElm.innerHTML = `<g>
+  <polyline points="${polylinePointsTxt}" stroke="#000" fill="none"></polyline>
+</g>`;
 
             requestAnimationFrame(ticker);
           };
 
           ticker();
-
         },
         (err) => {
           console.log("The following error occured: " + err);
@@ -87,6 +91,28 @@ export default () => {
     } else {
       console.log("getUserMedia not supported");
     }
+
+    $btnCapture.on('click', (_evt) => {
+      historyArr.push(ns.ptArr);
+
+      const ptArr = _.last(historyArr);
+
+      damaElm.innerHTML = '';
+
+      let xTmp;
+      let yTmp;
+
+      const linesTxt = generateLines(ptArr);
+      const circlesTxt = generateCircles(ptArr);
+      const polylinePointsTxt = generatePolylinePoints(ptArr);
+
+      damaElm.innerHTML = `<g>
+  <polyline points="${polylinePointsTxt}" stroke="#000" fill="none"></polyline>
+</g>
+<g>
+  ${circlesTxt}
+</g>`;
+    });
   }
 
   window.addEventListener("load", initialize, false);
