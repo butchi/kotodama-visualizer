@@ -11,6 +11,8 @@ var _ns = require('./ns');
 
 var _ns2 = _interopRequireDefault(_ns);
 
+var _config = require('./config');
+
 var _util = require('./util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -33,9 +35,9 @@ var AnalyticSignal = function () {
 
     this.vol = 0;
 
-    for (var i = _ns2.default.kernelLen, l = arr.length - _ns2.default.kernelLen; i < l; i++) {
+    for (var i = _config.kernelLen, l = arr.length - _config.kernelLen; i < l; i++) {
       var hilbTmp = 0;
-      for (var k = -_ns2.default.kernelLen; k <= _ns2.default.kernelLen; k++) {
+      for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
         hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(arr[i + k]) || 0);
       }
       var reVal = (0, _util.normalize)(arr[i]);
@@ -46,57 +48,11 @@ var AnalyticSignal = function () {
 
       this.vol = Math.max(this.vol, Math.sqrt(reVal * reVal + imVal * imVal));
     }
-
-    this.$canvas = $('<canvas></canvas>');
-    this.$canvas.attr('width', _ns2.default.width);
-    this.$canvas.attr('height', _ns2.default.height);
-    _ns2.default.$stage.append(this.$canvas);
-
-    var me = this;
-    this.$canvas.on('mousedown', function (evt) {
-      me.state = 'move';
-      me.play();
-
-      $('body').on('mousemove', function (evt) {
-        if (me.state === 'move') {
-          me.$canvas.css({
-            'left': evt.pageX - _ns2.default.tWidth / 2,
-            'top': evt.pageY - _ns2.default.tHeight / 2
-          });
-        }
-      });
-    });
-
-    this.$canvas.on('mouseup', function (evt) {
-      me.state = 'stop';
-      $('body').off('mousemove');
-    });
   }
 
   _createClass(AnalyticSignal, [{
     key: 'draw',
-    value: function draw(hue) {
-      var canvasContext = this.$canvas.get(0).getContext("2d");
-
-      canvasContext.clearRect(0, 0, _ns2.default.width, _ns2.default.height);
-      canvasContext.strokeStyle = tinycolor({ h: hue || 0, s: 100, v: 100 }).toRgbString();
-      canvasContext.beginPath();
-
-      var len = this.reArr.length;
-      for (var i = 0; i < len; i++) {
-        var x, y;
-        x = _ns2.default.width / 2 + _ns2.default.amp * this.reArr[i];
-        y = _ns2.default.height / 2 - _ns2.default.amp * this.imArr[i];
-        canvasContext.lineTo(x, y);
-      }
-      canvasContext.stroke();
-
-      // volume circle
-      // canvasContext.beginPath();
-      // canvasContext.strokeStyle = 'rgb(128, 128, 128)';
-      // canvasContext.arc(ns.width/2, ns.height/2, this.vol*ns.amp, 0, Math.PI*2, true);;
-      // canvasContext.stroke();
-    }
+    value: function draw(hue) {}
   }, {
     key: 'play',
     value: function play() {
@@ -106,8 +62,7 @@ var AnalyticSignal = function () {
       // var audioBuffer = context.createBuffer(channel, length, context.sampleRate);
 
       var data = audioBuffer.getChannelData(0);
-      var i;
-      for (i = 0; i < this.origArr.length; i++) {
+      for (var i = 0; i < this.origArr.length; i++) {
         data[i] = (this.origArr[i] - 128) / 128;
       }
 
@@ -133,7 +88,18 @@ var AnalyticSignal = function () {
 
 exports.default = AnalyticSignal;
 
-},{"./ns":3,"./util":5}],2:[function(require,module,exports){
+},{"./config":2,"./ns":4,"./util":6}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var kernelLen = exports.kernelLen = 127;
+var amp = exports.amp = 128;
+var width = exports.width = 256;
+var height = exports.height = 256;
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -179,7 +145,7 @@ var Main = function () {
 
 exports.default = Main;
 
-},{"./router":4}],3:[function(require,module,exports){
+},{"./router":5}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -194,7 +160,7 @@ window.App = window.App || {};
 var ns = window.App;
 exports.default = ns;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -253,7 +219,7 @@ var Router = function () {
 
 exports.default = Router;
 
-},{"../page/common":6,"../page/index":7,"../page/sub":8,"./ns":3}],5:[function(require,module,exports){
+},{"../page/common":7,"../page/index":8,"../page/sub":9,"./ns":4}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -280,7 +246,7 @@ var mod = exports.mod = function mod(i, j) {
   return i % j + (i < 0 ? j : 0);
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -317,7 +283,7 @@ function setEnvClass() {
   }
 }
 
-},{"../module/ns":3}],7:[function(require,module,exports){
+},{"../module/ns":4}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -327,6 +293,8 @@ Object.defineProperty(exports, "__esModule", {
 var _ns = require('../module/ns');
 
 var _ns2 = _interopRequireDefault(_ns);
+
+var _config = require('../module/config');
 
 var _util = require('../module/util');
 
@@ -341,26 +309,12 @@ exports.default = function () {
   window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
   window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 
-  _ns2.default.width = 256;
-  _ns2.default.height = 256;
-
-  _ns2.default.tWidth = 128;
-  _ns2.default.tHeight = 128;
-
-  _ns2.default.kernelLen = 127;
-  _ns2.default.amp = 128;
-
-  function initialize() {
+  var initialize = function initialize() {
 
     var audioElm = document.getElementById("audio");
     var $output = $(".output");
-    var canvasElm = document.getElementById("canvas");
-    var canvasContext = canvasElm.getContext("2d");
-    var timeDomainData;
-    _ns2.default.$stage = $('.snapshot');
-
-    canvasElm.width = _ns2.default.width;
-    canvasElm.height = _ns2.default.height;
+    var stageElm = document.querySelector('[data-js-stage]');
+    var timeDomainData = void 0;
 
     if (navigator.getUserMedia) {
       navigator.getUserMedia({ audio: true }, function (stream) {
@@ -374,7 +328,16 @@ exports.default = function () {
         timeDomainData = new Uint8Array(analyser.frequencyBinCount);
         mediastreamsource.connect(analyser);
 
-        var animation = function animation() {
+        var time = 0;
+
+        var ticker = function ticker() {
+          time++;
+
+          if (time % 10 !== 0) {
+            requestAnimationFrame(ticker);
+            return;
+          }
+
           analyser.getByteFrequencyData(frequencyData);
           analyser.getByteTimeDomainData(timeDomainData);
 
@@ -383,48 +346,49 @@ exports.default = function () {
           var baseHz = 243; // C4
           var octave = Math.log(hz / baseHz) / Math.log(2);
           var hue = (0, _util.mod)(octave, 1) * 360;
-          _ns2.default.currentHue = hue;
+          // ns.currentHue = hue;
 
-          var i, k;
-          canvasContext.clearRect(0, 0, _ns2.default.width, _ns2.default.height);
-          canvasContext.strokeStyle = tinycolor({ h: hue, s: 100, v: 100 }).toRgbString();
-          canvasContext.beginPath();
+          var xTmp = void 0;
+          var yTmp = void 0;
 
-          for (var i = _ns2.default.kernelLen, l = timeDomainData.length - _ns2.default.kernelLen; i < l; i++) {
+          var linesTxt = '';
+
+          stageElm.innerHTML = '';
+
+          for (var i = _config.kernelLen, l = timeDomainData.length - _config.kernelLen; i < l; i++) {
             var hilbTmp = 0;
-            for (k = -_ns2.default.kernelLen; k <= _ns2.default.kernelLen; k++) {
+            for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
               hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(timeDomainData[i + k]) || 0);
             }
-            var x = _ns2.default.width / 2 + _ns2.default.amp * (0, _util.normalize)(timeDomainData[i]);
-            var y = _ns2.default.height / 2 - _ns2.default.amp * hilbTmp;
-            canvasContext.lineTo(x, y);
-          }
-          canvasContext.stroke();
+            var x = _config.width / 2 + _config.amp * (0, _util.normalize)(timeDomainData[i]);
+            var y = _config.height / 2 - _config.amp * hilbTmp;
 
-          requestAnimationFrame(animation);
+            if (xTmp != null && yTmp != null) {
+              linesTxt += '<line x1="' + xTmp + '" y1="' + yTmp + '" x2="' + x + '" y2="' + y + '" stroke="#000"></line>';
+            }
+
+            xTmp = x;
+            yTmp = y;
+          }
+
+          stageElm.innerHTML = linesTxt;
+
+          requestAnimationFrame(ticker);
         };
 
-        animation();
+        ticker();
       }, function (err) {
         console.log("The following error occured: " + err);
       });
     } else {
       console.log("getUserMedia not supported");
     }
-
-    $('.btn-rec').on('click', function () {
-      var as = new _analyticSignal2.default(timeDomainData);
-      as.$canvas.css('left', 300 + Math.random() * 500);
-      as.$canvas.css('top', Math.random() * 500);
-      as.draw(_ns2.default.currentHue);
-      as.play();
-    });
-  }
+  };
 
   window.addEventListener("load", initialize, false);
 };
 
-},{"../module/analytic-signal":1,"../module/ns":3,"../module/util":5}],8:[function(require,module,exports){
+},{"../module/analytic-signal":1,"../module/config":2,"../module/ns":4,"../module/util":6}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -441,7 +405,7 @@ exports.default = function () {
   console.log('sub page');
 };
 
-},{"../module/ns":3}],9:[function(require,module,exports){
+},{"../module/ns":4}],10:[function(require,module,exports){
 'use strict';
 
 var _ns = require('./module/ns');
@@ -458,4 +422,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _ns2.default.main = new _main2.default();
 
-},{"./module/main":2,"./module/ns":3}]},{},[9]);
+},{"./module/main":3,"./module/ns":4}]},{},[10]);
