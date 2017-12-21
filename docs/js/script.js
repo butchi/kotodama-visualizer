@@ -95,7 +95,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var kernelLen = exports.kernelLen = 127;
-var amp = exports.amp = 128;
+var amp = exports.amp = 100;
 var width = exports.width = 256;
 var height = exports.height = 256;
 
@@ -225,6 +225,10 @@ exports.default = Router;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.generatePolylinePoints = exports.generateCircles = exports.generatePolygons = exports.generateLines = exports.getHexString = exports.norm = exports.mod = exports.maxIndexOf = exports.normalize = exports.inv = undefined;
+
+var _config = require('./config');
+
 var inv = exports.inv = function inv(n) {
   if (n === 0) {
     return 0;
@@ -246,20 +250,51 @@ var mod = exports.mod = function mod(i, j) {
   return i % j + (i < 0 ? j : 0);
 };
 
+var norm = exports.norm = function norm(x) {
+  var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  return Math.sqrt(x * x + y * y);
+};
+
+var getHexString = exports.getHexString = function getHexString() {
+  var hue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var brightness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+  var saturation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
+
+  var h = hue;
+  var s = saturation;
+  var v = brightness;
+
+  return tinycolor({ h: h, s: s, v: v }).toHexString();
+};
+
 var generateLines = exports.generateLines = function generateLines(ptArr) {
   return ptArr.reduce(function (txt, pt, i, arr) {
     if (i > 0) {
       var prevPt = arr[i - 1];
-      return txt + ('<line x1="' + prevPt.x + '" y1="' + prevPt.y + '" x2="' + pt.x + '" y2="' + pt.y + '" stroke="#000"></line>');
+      return txt + ('<line x1="' + prevPt.x + '" y1="' + prevPt.y + '" x2="' + pt.x + '" y2="' + pt.y + '"></line>');
     }
 
     return '';
   });
 };
 
+var generatePolygons = exports.generatePolygons = function generatePolygons(ptArr) {
+  var opacity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  return ptArr.reduce(function (txt, pt, i, arr) {
+    if (i > 0) {
+      var prevPt = arr[i - 1];
+      return txt + ('<polygon points="' + _config.width / 2 + ',' + _config.height / 2 + ' ' + prevPt.x + ',' + prevPt.y + ' ' + pt.x + ',' + pt.y + '" fill="' + getHexString(pt.hue) + '" fill-opacity="' + opacity + '"></polygon>');
+    }
+
+    return '';
+  }, '');
+};
+
 var generateCircles = exports.generateCircles = function generateCircles(ptArr) {
   return ptArr.reduce(function (txt, pt) {
-    return txt + ('<circle cx="' + pt.x + '" cy="' + pt.y + '" r="1" fill="#000"></circle>');
+    return txt + ('<circle cx="' + pt.x + '" cy="' + pt.y + '" r=".5"></circle>');
   }, '');
 };
 
@@ -269,7 +304,7 @@ var generatePolylinePoints = exports.generatePolylinePoints = function generateP
   }, '');
 };
 
-},{}],7:[function(require,module,exports){
+},{"./config":2}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -340,8 +375,6 @@ exports.default = function () {
     var playerElm = document.querySelector('[data-js-player]');
     var $btnCapture = $('[data-js-btn-capture]');
 
-    var historyArr = [];
-
     var timeDomainData = void 0;
 
     if (navigator.getUserMedia) {
@@ -356,16 +389,19 @@ exports.default = function () {
         timeDomainData = new Uint8Array(analyser.frequencyBinCount);
         mediastreamsource.connect(analyser);
 
-        var time = 0;
+        var fragmentTxtArr = [];
+
+        var cnt = 0;
+        var ghostLen = 10;
 
         var ticker = function ticker() {
-          time++;
+          cnt++;
 
-          // 間引き処理
-          if (time % 10 !== 0) {
-            requestAnimationFrame(ticker);
-            return;
-          }
+          // // 間引き処理
+          // if (cnt % 10 !== 0) {
+          //   requestAnimationFrame(ticker);
+          //   return;
+          // }
 
           analyser.getByteFrequencyData(frequencyData);
           analyser.getByteTimeDomainData(timeDomainData);
@@ -374,13 +410,11 @@ exports.default = function () {
           var hz = (0, _util.maxIndexOf)(frequencyData) * hzUnit;
           var baseHz = 243; // C4
           var octave = Math.log(hz / baseHz) / Math.log(2);
+
           var hue = (0, _util.mod)(octave, 1) * 360;
-          // ns.currentHue = hue;
+          var hexString = tinycolor({ h: hue || 0, s: 100, v: 100 }).toHexString();
 
-          var xTmp = void 0;
-          var yTmp = void 0;
-
-          var ptArr = _ns2.default.ptArr = [];
+          var ptArr = [];
 
           stageElm.innerHTML = '';
 
@@ -389,15 +423,25 @@ exports.default = function () {
             for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
               hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(timeDomainData[i + k]) || 0);
             }
-            var x = _config.width / 2 + _config.amp * (0, _util.normalize)(timeDomainData[i]);
-            var y = _config.height / 2 - _config.amp * hilbTmp;
+            var re = (0, _util.normalize)(timeDomainData[i]);
+            var im = hilbTmp;
+            var x = _config.width / 2 + _config.amp * re;
+            var y = _config.height / 2 - _config.amp * im;
 
-            _ns2.default.ptArr.push({ x: x, y: y });
+            var volume = (0, _util.norm)(re, im);
+
+            ptArr.push({ re: re, im: im, x: x, y: y, hue: hue, volume: volume, amp: _config.amp });
           }
 
-          var polylinePointsTxt = (0, _util.generatePolylinePoints)(ptArr);
+          var volAvg = _.meanBy(ptArr, 'volume');
+          var opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
 
-          stageElm.innerHTML = '<g>\n  <polyline points="' + polylinePointsTxt + '" stroke="#000" fill="none"></polyline>\n</g>';
+          // ns.fragmentTxt = `<g fill="${getHexString(hue)}" opacity="${opacity}">${generateCircles(ptArr)}</g>`;
+          // ns.fragmentTxt = `<polyline points="${generatePolylinePoints(ptArr)}" fill="${hexString}" fill-opacity="${opacity}"></polyline>`;
+          _ns2.default.fragmentTxt = '<g>' + (0, _util.generatePolygons)(ptArr, 0.1) + '</g>';
+          fragmentTxtArr.push(_ns2.default.fragmentTxt);
+
+          stageElm.innerHTML = _.takeRight(fragmentTxtArr, ghostLen).join('');
 
           requestAnimationFrame(ticker);
         };
@@ -411,20 +455,7 @@ exports.default = function () {
     }
 
     $btnCapture.on('click', function (_evt) {
-      historyArr.push(_ns2.default.ptArr);
-
-      var ptArr = _.last(historyArr);
-
-      damaElm.innerHTML = '';
-
-      var xTmp = void 0;
-      var yTmp = void 0;
-
-      var linesTxt = (0, _util.generateLines)(ptArr);
-      var circlesTxt = (0, _util.generateCircles)(ptArr);
-      var polylinePointsTxt = (0, _util.generatePolylinePoints)(ptArr);
-
-      damaElm.innerHTML = '<g>\n  <polyline points="' + polylinePointsTxt + '" stroke="#000" fill="none"></polyline>\n</g>\n<g>\n  ' + circlesTxt + '\n</g>';
+      damaElm.innerHTML = _ns2.default.fragmentTxt;
     });
   };
 
