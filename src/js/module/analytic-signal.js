@@ -18,7 +18,7 @@ export default class AnalyticSignal {
 
     for (let i = kernelLen, l = arr.length - kernelLen; i < l; i++) {
       let hilbTmp = 0;
-      for (var k = -kernelLen; k <= kernelLen; k++) {
+      for (var k = - kernelLen; k <= kernelLen; k++) {
         hilbTmp += inv(k) * (normalize(arr[i + k]) || 0);
       }
       const reVal = normalize(arr[i]);

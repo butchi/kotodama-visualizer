@@ -1,6 +1,6 @@
 import ns from '../module/ns';
 import { kernelLen, amp, width, height } from '../module/config';
-import { inv, normalize, maxIndexOf, mod, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
+import { inv, normalize, maxIndexOf, mod, norm, getHexString, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
 import AnalyticSignal from '../module/analytic-signal';
 
 export default () => {
@@ -15,8 +15,6 @@ export default () => {
     const damaElm = document.querySelector('[data-js-dama]');
     const playerElm = document.querySelector('[data-js-player]');
     const $btnCapture = $('[data-js-btn-capture]');
-
-    const historyArr = [];
 
     let timeDomainData;
 
@@ -34,16 +32,19 @@ export default () => {
           timeDomainData = new Uint8Array(analyser.frequencyBinCount);
           mediastreamsource.connect(analyser);
 
-          let time = 0;
+          const fragmentTxtArr = [];
+
+          let cnt = 0;
+          const ghostLen = 10;
 
           const ticker = () => {
-            time++;
+            cnt++;
 
-            // 間引き処理
-            if (time % 10 !== 0) {
-              requestAnimationFrame(ticker);
-              return;
-            }
+            // // 間引き処理
+            // if (cnt % 10 !== 0) {
+            //   requestAnimationFrame(ticker);
+            //   return;
+            // }
 
             analyser.getByteFrequencyData(frequencyData);
             analyser.getByteTimeDomainData(timeDomainData);
@@ -52,32 +53,38 @@ export default () => {
             const hz = maxIndexOf(frequencyData) * hzUnit;
             const baseHz = 243; // C4
             const octave = Math.log(hz/baseHz) / Math.log(2);
+
             const hue = mod(octave, 1) * 360;
-            // ns.currentHue = hue;
+            const hexString = tinycolor({ h: (hue || 0), s: 100, v: 100 }).toHexString();
 
-            let xTmp;
-            let yTmp;
-
-            const ptArr = ns.ptArr = [];
+            const ptArr = [];
 
             stageElm.innerHTML = '';
 
             for (let i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
               let hilbTmp = 0;
-              for(let k = -kernelLen; k <= kernelLen; k++) {
+              for (let k = - kernelLen; k <= kernelLen; k++) {
                 hilbTmp += inv(k) * (normalize(timeDomainData[i + k]) || 0);
               }
-              const x = width/2 + amp * normalize(timeDomainData[i]);
-              const y = height/2 - amp * hilbTmp;
+              const re = normalize(timeDomainData[i]);
+              const im = hilbTmp;
+              const x = width / 2 + amp * re;
+              const y = height / 2 - amp * im;
 
-              ns.ptArr.push({x, y});
+              const volume = norm(re, im);
+
+              ptArr.push({re, im, x, y, hue, volume, amp});
             }
 
-            const polylinePointsTxt = generatePolylinePoints(ptArr);
+            const volAvg = _.meanBy(ptArr, 'volume');
+            const opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
 
-            stageElm.innerHTML = `<g>
-  <polyline points="${polylinePointsTxt}" stroke="#000" fill="none"></polyline>
-</g>`;
+            // ns.fragmentTxt = `<g fill="${getHexString(hue)}" opacity="${opacity}">${generateCircles(ptArr)}</g>`;
+            // ns.fragmentTxt = `<polyline points="${generatePolylinePoints(ptArr)}" fill="${hexString}" fill-opacity="${opacity}"></polyline>`;
+            ns.fragmentTxt = `<g>${generatePolygons(ptArr, 0.1)}</g>`;
+            fragmentTxtArr.push(ns.fragmentTxt);
+
+            stageElm.innerHTML = _.takeRight(fragmentTxtArr, ghostLen).join('');
 
             requestAnimationFrame(ticker);
           };
@@ -93,25 +100,7 @@ export default () => {
     }
 
     $btnCapture.on('click', (_evt) => {
-      historyArr.push(ns.ptArr);
-
-      const ptArr = _.last(historyArr);
-
-      damaElm.innerHTML = '';
-
-      let xTmp;
-      let yTmp;
-
-      const linesTxt = generateLines(ptArr);
-      const circlesTxt = generateCircles(ptArr);
-      const polylinePointsTxt = generatePolylinePoints(ptArr);
-
-      damaElm.innerHTML = `<g>
-  <polyline points="${polylinePointsTxt}" stroke="#000" fill="none"></polyline>
-</g>
-<g>
-  ${circlesTxt}
-</g>`;
+      damaElm.innerHTML = ns.fragmentTxt;
     });
   }
 
