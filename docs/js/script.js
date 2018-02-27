@@ -2806,7 +2806,7 @@ var AnalyticSignal = function () {
 
       var hue = this.hue(frequencyData);
 
-      var rgba = (0, _util.getHsvColor)(hue || 0, 0.8, 0.5).alpha(1).css();
+      var rgba = (0, _util.getHsvColor)(hue || 0, 0.8, 0.5).alpha(0.3).css();
 
       var ptArr = [];
 
