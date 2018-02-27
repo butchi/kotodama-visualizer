@@ -1,6 +1,6 @@
 import ns from './ns';
 import { kernelLen, amp, width, height } from '../module/config';
-import { inv, normalize, maxIndexOf, mod, norm, getHexString, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
+import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
 
 export default class AnalyticSignal {
   constructor(opts = {}) {
@@ -20,7 +20,7 @@ export default class AnalyticSignal {
 
     const hue = this.hue(frequencyData);
 
-    const hexString = tinycolor({ h: (hue || 0), s: 100, v: 100 }).toHexString();
+    const rgba = getHsvColor(hue || 0, 0.5, 1).alpha(1).css();
 
     const ptArr = [];
 
@@ -55,7 +55,7 @@ export default class AnalyticSignal {
     ptArr.forEach((pt) => {
       if (prev.x != null && prev.y != null) {
         context.beginPath();
-        context.fillStyle = hexString;
+        context.fillStyle = rgba;
         context.moveTo(width / 2,  height / 2);
         context.lineTo(prev.x, prev.y);
         context.lineTo(pt.x, pt.y);

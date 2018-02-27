@@ -1,3 +1,4 @@
+import chroma from 'chroma-js';
 import { kernelLen, amp, width, height } from './config';
 
 export const inv = (n) => {
@@ -25,12 +26,12 @@ export const norm = (x, y = 0) => {
   return Math.sqrt(x * x + y * y);
 };
 
-export const getHexString = (hue = 0, brightness = 100, saturation = 100) => {
+export const getHsvColor = (hue = 0, brightness = 0.5, saturation = 1) => {
   const h = hue;
   const s = saturation;
   const v = brightness;
 
-  return tinycolor({ h, s, v }).toHexString();
+  return chroma.hsl(h, s, v);
 };
 
 // export const generateLines = (ptArr) => {
