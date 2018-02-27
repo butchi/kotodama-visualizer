@@ -28,15 +28,10 @@
         <h1>Index Page</h1>
       </header>
       <main>
-        <audio id="audio" autoplay></audio>
         <audio class="output" autoplay></audio>
-        <svg class="stage" data-js-stage xmlns="http://www.w3.org/2000/svg" width="256" height="256"></svg>
-        <div class="btn-capture">
-          <button data-js-btn-capture>📷</button>
-        </div>
-        <div class="preview-area">
-          <svg class="dama" data-js-dama xmlns="http://www.w3.org/2000/svg" width="256" height="256"></svg>
-          <svg class="player" data-js-player xmlns="http://www.w3.org/2000/svg" width="256" height="256"></svg>
+        <canvas class="stage" data-js-stage width="256" height="256"></canvas>
+        <div class="btn-play">
+          <button data-js-btn-play>▶️</button>
         </div>
       </main>
     </div>
@@ -44,6 +39,6 @@
     <script src="./js/lib/jquery.min.js"></script>
     <script src="./js/lib/lodash.min.js"></script>
     <script src="./js/lib/tinycolor.js"></script>
-    <script src="./js/script.js?v=4"></script>
+    <script src="./js/script.js?v=5"></script>
   </body>
 </html>

@@ -11,75 +11,106 @@ var _ns = require('./ns');
 
 var _ns2 = _interopRequireDefault(_ns);
 
-var _config = require('./config');
+var _config = require('../module/config');
 
-var _util = require('./util');
+var _util = require('../module/util');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var AnalyticSignal = function () {
-  function AnalyticSignal(arr) {
+  function AnalyticSignal() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, AnalyticSignal);
 
-    this.origArr = new Uint8Array(arr.length);
-    for (var n = 0; n < arr.length; n++) {
-      this.origArr[n] = arr[n];
-    }
-
-    this.state = 'stop';
-
-    this.reArr = new Array();
-    this.imArr = new Array();
-
-    this.vol = 0;
-
-    for (var i = _config.kernelLen, l = arr.length - _config.kernelLen; i < l; i++) {
-      var hilbTmp = 0;
-      for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
-        hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(arr[i + k]) || 0);
-      }
-      var reVal = (0, _util.normalize)(arr[i]);
-      var imVal = hilbTmp;
-
-      this.reArr.push(reVal);
-      this.imArr.push(imVal);
-
-      this.vol = Math.max(this.vol, Math.sqrt(reVal * reVal + imVal * imVal));
-    }
+    this.initialize(opts);
   }
 
   _createClass(AnalyticSignal, [{
-    key: 'draw',
-    value: function draw(hue) {}
-  }, {
-    key: 'play',
-    value: function play() {
-      //Create the instance of AudioBuffer (Synchronously)
-      var context = new AudioContext();
-      var audioBuffer = context.createBuffer(1, 1024, context.sampleRate);
-      // var audioBuffer = context.createBuffer(channel, length, context.sampleRate);
+    key: 'initialize',
+    value: function initialize() {
+      var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      var data = audioBuffer.getChannelData(0);
-      for (var i = 0; i < this.origArr.length; i++) {
-        data[i] = (this.origArr[i] - 128) / 128;
+      var stageElm = this.stageElm = opts.stageElm;
+      var fftSize = this.fftSize = opts.fftSize;
+      var sampleRate = this.sampleRate = opts.sampleRate;
+
+      var context = this.context = stageElm.getContext('2d');
+    }
+  }, {
+    key: 'draw',
+    value: function draw(_ref) {
+      var frequencyData = _ref.frequencyData,
+          timeDomainData = _ref.timeDomainData;
+
+      var context = this.context;
+
+      var hue = this.hue(frequencyData);
+
+      var hexString = tinycolor({ h: hue || 0, s: 100, v: 100 }).toHexString();
+
+      var ptArr = [];
+
+      var fragmentTxtArr = [];
+
+      var ghostLen = 10;
+
+      for (var i = _config.kernelLen, l = timeDomainData.length - _config.kernelLen; i < l; i++) {
+        var hilbTmp = 0;
+        for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
+          hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(timeDomainData[i + k]) || 0);
+        }
+        var re = (0, _util.normalize)(timeDomainData[i]);
+        var im = hilbTmp;
+        var x = _config.width / 2 + _config.amp * re;
+        var y = _config.height / 2 - _config.amp * im;
+
+        var volume = (0, _util.norm)(re, im);
+
+        ptArr.push({ re: re, im: im, x: x, y: y, hue: hue, volume: volume, amp: _config.amp });
       }
 
-      //Create the instance of AudioBufferSourceNode
-      var source = context.createBufferSource();
-      //Set the instance of AudioBuffer
-      source.buffer = audioBuffer;
+      var volAvg = _.meanBy(ptArr, 'volume');
+      var opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
 
-      source.loop = true;
-      source.loopStart = 0;
-      source.loopEnd = audioBuffer.duration;
-      source.playbackRate.value = 1.0;
-      //AudioBufferSourceNode (input) -> AudioDestinationNode (output)
-      source.connect(context.destination);
+      var prev = { x: null, y: null };
 
-      source.start(0);
-      source.stop(0.5);
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, _config.width, _config.height);
+
+      ptArr.forEach(function (pt) {
+        if (prev.x != null && prev.y != null) {
+          context.beginPath();
+          context.fillStyle = hexString;
+          context.moveTo(_config.width / 2, _config.height / 2);
+          context.lineTo(prev.x, prev.y);
+          context.lineTo(pt.x, pt.y);
+          context.lineTo(_config.width / 2, _config.height / 2);
+          context.fill();
+        }
+
+        prev.x = pt.x;
+        prev.y = pt.y;
+      });
+    }
+  }, {
+    key: 'hue',
+    value: function hue(frequencyData) {
+      var ret = void 0;
+
+      var sampleRate = this.sampleRate;
+      var fftSize = this.fftSize;
+
+      var hzUnit = sampleRate / fftSize; // frequencyData 1つあたりの周波数
+      var hz = (0, _util.maxIndexOf)(frequencyData) * hzUnit;
+      var baseHz = 243; // C4
+      var octave = Math.log(hz / baseHz) / Math.log(2);
+
+      ret = (0, _util.mod)(octave, 1) * 360;
+
+      return ret;
     }
   }]);
 
@@ -88,7 +119,7 @@ var AnalyticSignal = function () {
 
 exports.default = AnalyticSignal;
 
-},{"./config":2,"./ns":4,"./util":6}],2:[function(require,module,exports){
+},{"../module/config":2,"../module/util":6,"./ns":4}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -225,7 +256,7 @@ exports.default = Router;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generatePolylinePoints = exports.generateCircles = exports.generatePolygons = exports.generateLines = exports.getHexString = exports.norm = exports.mod = exports.maxIndexOf = exports.normalize = exports.inv = undefined;
+exports.getHexString = exports.norm = exports.mod = exports.maxIndexOf = exports.normalize = exports.inv = undefined;
 
 var _config = require('./config');
 
@@ -268,41 +299,39 @@ var getHexString = exports.getHexString = function getHexString() {
   return tinycolor({ h: h, s: s, v: v }).toHexString();
 };
 
-var generateLines = exports.generateLines = function generateLines(ptArr) {
-  return ptArr.reduce(function (txt, pt, i, arr) {
-    if (i > 0) {
-      var prevPt = arr[i - 1];
-      return txt + ('<line x1="' + prevPt.x + '" y1="' + prevPt.y + '" x2="' + pt.x + '" y2="' + pt.y + '"></line>');
-    }
+// export const generateLines = (ptArr) => {
+//   return ptArr.reduce((txt, pt, i, arr) => {
+//     if (i > 0) {
+//       const prevPt = arr[i - 1];
+//       return txt + `<line x1="${prevPt.x}" y1="${prevPt.y}" x2="${pt.x}" y2="${pt.y}"></line>`;
+//     }
 
-    return '';
-  });
-};
+//     return '';
+//   });
+// };
 
-var generatePolygons = exports.generatePolygons = function generatePolygons(ptArr) {
-  var opacity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+// export const generatePolygons = (ptArr, opacity = 1) => {
+//   return ptArr.reduce((txt, pt, i, arr) => {
+//     if (i > 0) {
+//       const prevPt = arr[i - 1];
+//       return txt + `<polygon points="${width / 2},${height / 2} ${prevPt.x},${prevPt.y} ${pt.x},${pt.y}" fill="${getHexString(pt.hue)}" fill-opacity="${opacity}"></polygon>`;
+//     }
 
-  return ptArr.reduce(function (txt, pt, i, arr) {
-    if (i > 0) {
-      var prevPt = arr[i - 1];
-      return txt + ('<polygon points="' + _config.width / 2 + ',' + _config.height / 2 + ' ' + prevPt.x + ',' + prevPt.y + ' ' + pt.x + ',' + pt.y + '" fill="' + getHexString(pt.hue) + '" fill-opacity="' + opacity + '"></polygon>');
-    }
+//     return '';
+//   }, '');
+// };
 
-    return '';
-  }, '');
-};
+// export const generateCircles = (ptArr) => {
+//   return ptArr.reduce((txt, pt) => {
+//     return txt + `<circle cx="${pt.x}" cy="${pt.y}" r=".5"></circle>`;
+//   }, '');
+// };
 
-var generateCircles = exports.generateCircles = function generateCircles(ptArr) {
-  return ptArr.reduce(function (txt, pt) {
-    return txt + ('<circle cx="' + pt.x + '" cy="' + pt.y + '" r=".5"></circle>');
-  }, '');
-};
-
-var generatePolylinePoints = exports.generatePolylinePoints = function generatePolylinePoints(ptArr) {
-  return ptArr.reduce(function (txt, pt) {
-    return txt + (pt.x + ' ' + pt.y + ' ');
-  }, '');
-};
+// export const generatePolylinePoints = (ptArr) => {
+//   return ptArr.reduce((txt, pt) => {
+//     return txt + `${pt.x} ${pt.y} `;
+//   }, '');
+// };
 
 },{"./config":2}],7:[function(require,module,exports){
 'use strict';
@@ -352,10 +381,6 @@ var _ns = require('../module/ns');
 
 var _ns2 = _interopRequireDefault(_ns);
 
-var _config = require('../module/config');
-
-var _util = require('../module/util');
-
 var _analyticSignal = require('../module/analytic-signal');
 
 var _analyticSignal2 = _interopRequireDefault(_analyticSignal);
@@ -363,106 +388,88 @@ var _analyticSignal2 = _interopRequireDefault(_analyticSignal);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = function () {
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-  window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
   window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 
   var initialize = function initialize() {
+    var url = 'audio/vivaldi-spring.mp3';
 
-    var audioElm = document.getElementById("audio");
     var stageElm = document.querySelector('[data-js-stage]');
-    var damaElm = document.querySelector('[data-js-dama]');
-    var playerElm = document.querySelector('[data-js-player]');
-    var $btnCapture = $('[data-js-btn-capture]');
+    var $btnPlay = $('[data-js-btn-play]');
 
+    var frequencyData = void 0;
     var timeDomainData = void 0;
 
-    if (navigator.getUserMedia) {
-      navigator.getUserMedia({ audio: true }, function (stream) {
-        var url = URL.createObjectURL(stream);
-        audioElm.src = url;
-        audioElm.volume = 0;
-        var audioContext = new AudioContext();
-        var mediastreamsource = audioContext.createMediaStreamSource(stream);
-        var analyser = audioContext.createAnalyser();
-        var frequencyData = new Uint8Array(analyser.frequencyBinCount);
-        timeDomainData = new Uint8Array(analyser.frequencyBinCount);
-        mediastreamsource.connect(analyser);
+    var cnt = 0;
 
-        var fragmentTxtArr = [];
+    var audioContext = new AudioContext();
 
-        var cnt = 0;
-        var ghostLen = 10;
+    var decodeAudioDataHandler = function decodeAudioDataHandler(buffer) {
+      if (!buffer) {
+        console.log('error');
+        return;
+      }
 
-        var ticker = function ticker() {
-          cnt++;
+      var sourceNode = audioContext.createBufferSource(); // AudioBufferSourceNodeを作成
+      sourceNode.buffer = buffer; // 取得した音声データ(バッファ)を音源に設定
+      var analyser = audioContext.createAnalyser(); // AnalyserNodeを作成
 
-          // // 間引き処理
-          // if (cnt % 10 !== 0) {
-          //   requestAnimationFrame(ticker);
-          //   return;
-          // }
+      frequencyData = new Uint8Array(analyser.frequencyBinCount);
+      timeDomainData = new Uint8Array(analyser.frequencyBinCount);
 
-          analyser.getByteFrequencyData(frequencyData);
-          analyser.getByteTimeDomainData(timeDomainData);
+      sourceNode.connect(analyser); // AudioBufferSourceNodeをAnalyserNodeに接続
+      analyser.connect(audioContext.destination); // AnalyserNodeをAudioDestinationNodeに接続
+      sourceNode.start(0); // 再生開始
 
-          var hzUnit = audioContext.sampleRate / analyser.fftSize; // frequencyData 1つあたりの周波数
-          var hz = (0, _util.maxIndexOf)(frequencyData) * hzUnit;
-          var baseHz = 243; // C4
-          var octave = Math.log(hz / baseHz) / Math.log(2);
+      var fftSize = analyser.fftSize;
+      var sampleRate = audioContext.sampleRate;
 
-          var hue = (0, _util.mod)(octave, 1) * 360;
-          var hexString = tinycolor({ h: hue || 0, s: 100, v: 100 }).toHexString();
-
-          var ptArr = [];
-
-          stageElm.innerHTML = '';
-
-          for (var i = _config.kernelLen, l = timeDomainData.length - _config.kernelLen; i < l; i++) {
-            var hilbTmp = 0;
-            for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
-              hilbTmp += (0, _util.inv)(k) * ((0, _util.normalize)(timeDomainData[i + k]) || 0);
-            }
-            var re = (0, _util.normalize)(timeDomainData[i]);
-            var im = hilbTmp;
-            var x = _config.width / 2 + _config.amp * re;
-            var y = _config.height / 2 - _config.amp * im;
-
-            var volume = (0, _util.norm)(re, im);
-
-            ptArr.push({ re: re, im: im, x: x, y: y, hue: hue, volume: volume, amp: _config.amp });
-          }
-
-          var volAvg = _.meanBy(ptArr, 'volume');
-          var opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
-
-          // ns.fragmentTxt = `<g fill="${getHexString(hue)}" opacity="${opacity}">${generateCircles(ptArr)}</g>`;
-          // ns.fragmentTxt = `<polyline points="${generatePolylinePoints(ptArr)}" fill="${hexString}" fill-opacity="${opacity}"></polyline>`;
-          _ns2.default.fragmentTxt = '<g>' + (0, _util.generatePolygons)(ptArr, 0.1) + '</g>';
-          fragmentTxtArr.push(_ns2.default.fragmentTxt);
-
-          stageElm.innerHTML = _.takeRight(fragmentTxtArr, ghostLen).join('');
-
-          requestAnimationFrame(ticker);
-        };
-
-        ticker();
-      }, function (err) {
-        console.log("The following error occured: " + err);
+      var analyticSignal = new _analyticSignal2.default({
+        stageElm: stageElm,
+        fftSize: fftSize,
+        sampleRate: sampleRate
       });
-    } else {
-      console.log("getUserMedia not supported");
-    }
 
-    $btnCapture.on('click', function (_evt) {
-      damaElm.innerHTML = _ns2.default.fragmentTxt;
+      var ticker = function ticker() {
+        cnt++;
+
+        analyser.getByteFrequencyData(frequencyData);
+        analyser.getByteTimeDomainData(timeDomainData);
+
+        analyticSignal.draw({
+          frequencyData: frequencyData,
+          timeDomainData: timeDomainData
+        });
+
+        requestAnimationFrame(ticker);
+      };
+
+      ticker();
+    };
+
+    var audioLoadHandler = function audioLoadHandler(response) {
+      // 取得したデータをデコードする。
+      audioContext.decodeAudioData(response, decodeAudioDataHandler, function (error) {
+        console.log('decodeAudioData error');
+      });
+    };
+
+    $btnPlay.on('click', function (_evt) {
+      var request = new XMLHttpRequest();
+      request.open('GET', url, true);
+      request.responseType = 'arraybuffer';
+
+      request.onload = function () {
+        audioLoadHandler(request.response);
+      };
+
+      request.send();
     });
   };
 
   window.addEventListener("load", initialize, false);
 };
 
-},{"../module/analytic-signal":1,"../module/config":2,"../module/ns":4,"../module/util":6}],9:[function(require,module,exports){
+},{"../module/analytic-signal":1,"../module/ns":4}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
