@@ -9,15 +9,9 @@ block content-block
       | Index Page
 
   main
-    audio#audio(autoplay)
     audio.output(autoplay)
-    svg.stage(data-js-stage, xmlns="http://www.w3.org/2000/svg", width="256", height="256")
+    canvas.stage(data-js-stage, width="256", height="256")
 
-    .btn-capture
-      button(data-js-btn-capture)
-        | 📷
-
-    .preview-area
-      svg.dama(data-js-dama, xmlns="http://www.w3.org/2000/svg", width="256", height="256")
-      svg.player(data-js-player, xmlns="http://www.w3.org/2000/svg", width="256", height="256")
-
+    .btn-play
+      button(data-js-btn-play)
+        | ▶️

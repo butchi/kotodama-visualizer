@@ -33,36 +33,36 @@ export const getHexString = (hue = 0, brightness = 100, saturation = 100) => {
   return tinycolor({ h, s, v }).toHexString();
 };
 
-export const generateLines = (ptArr) => {
-  return ptArr.reduce((txt, pt, i, arr) => {
-    if (i > 0) {
-      const prevPt = arr[i - 1];
-      return txt + `<line x1="${prevPt.x}" y1="${prevPt.y}" x2="${pt.x}" y2="${pt.y}"></line>`;
-    }
+// export const generateLines = (ptArr) => {
+//   return ptArr.reduce((txt, pt, i, arr) => {
+//     if (i > 0) {
+//       const prevPt = arr[i - 1];
+//       return txt + `<line x1="${prevPt.x}" y1="${prevPt.y}" x2="${pt.x}" y2="${pt.y}"></line>`;
+//     }
 
-    return '';
-  });
-};
+//     return '';
+//   });
+// };
 
-export const generatePolygons = (ptArr, opacity = 1) => {
-  return ptArr.reduce((txt, pt, i, arr) => {
-    if (i > 0) {
-      const prevPt = arr[i - 1];
-      return txt + `<polygon points="${width / 2},${height / 2} ${prevPt.x},${prevPt.y} ${pt.x},${pt.y}" fill="${getHexString(pt.hue)}" fill-opacity="${opacity}"></polygon>`;
-    }
+// export const generatePolygons = (ptArr, opacity = 1) => {
+//   return ptArr.reduce((txt, pt, i, arr) => {
+//     if (i > 0) {
+//       const prevPt = arr[i - 1];
+//       return txt + `<polygon points="${width / 2},${height / 2} ${prevPt.x},${prevPt.y} ${pt.x},${pt.y}" fill="${getHexString(pt.hue)}" fill-opacity="${opacity}"></polygon>`;
+//     }
 
-    return '';
-  }, '');
-};
+//     return '';
+//   }, '');
+// };
 
-export const generateCircles = (ptArr) => {
-  return ptArr.reduce((txt, pt) => {
-    return txt + `<circle cx="${pt.x}" cy="${pt.y}" r=".5"></circle>`;
-  }, '');
-};
+// export const generateCircles = (ptArr) => {
+//   return ptArr.reduce((txt, pt) => {
+//     return txt + `<circle cx="${pt.x}" cy="${pt.y}" r=".5"></circle>`;
+//   }, '');
+// };
 
-export const generatePolylinePoints = (ptArr) => {
-  return ptArr.reduce((txt, pt) => {
-    return txt + `${pt.x} ${pt.y} `;
-  }, '');
-};
+// export const generatePolylinePoints = (ptArr) => {
+//   return ptArr.reduce((txt, pt) => {
+//     return txt + `${pt.x} ${pt.y} `;
+//   }, '');
+// };
