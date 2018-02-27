@@ -26,7 +26,7 @@ export const norm = (x, y = 0) => {
   return Math.sqrt(x * x + y * y);
 };
 
-export const getHsvColor = (hue = 0, brightness = 0.5, saturation = 1) => {
+export const getHsvColor = (hue = 0, saturation = 1, brightness = 0.5) => {
   const h = hue;
   const s = saturation;
   const v = brightness;

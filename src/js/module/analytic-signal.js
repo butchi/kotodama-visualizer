@@ -20,7 +20,7 @@ export default class AnalyticSignal {
 
     const hue = this.hue(frequencyData);
 
-    const rgba = getHsvColor(hue || 0, 0.5, 1).alpha(1).css();
+    const rgba = getHsvColor(hue || 0, 0.8, 0.5).alpha(1).css();
 
     const ptArr = [];
 
