@@ -80,5 +80,5 @@ export default () => {
     });
   }
 
-  window.addEventListener("load", initialize, false);
+  initialize();
 }
