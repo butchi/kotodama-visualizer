@@ -4,14 +4,22 @@ append config-block
   - pageId = 'index'
 
 block content-block
-  header
-    h1
-      | Index Page
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer
+    .mdl-layout__drawer
+      span.mdl-layout-title コトダマ可視化デモ
+      nav.mdl-navigation
+        a.mdl-navigation__link(href='./')
+          i.material-icons
+            | mic
+          | マイク入力
+        a.mdl-navigation__link(href='./?audio=vivaldi-spring')
+          | ヴィヴァルディ 四季より『春』
+        a.mdl-navigation__link(href='./?audio=chopin-nocturnes')
+          | ショパン『夜想曲第二番』
+        a.mdl-navigation__link(href='./?audio=satie-je-te-veux')
+          | サティ『Je te veux』
 
-  main
-    audio.output(autoplay)
-    canvas.stage(data-js-stage, width="256", height="256")
-
-    .btn-play
-      button(data-js-btn-play)
-        | ▶️
+    main.mdl-layout__content
+      .page-content
+        audio(data-js-output, autoplay)
+        canvas.stage(data-js-stage, width="256", height="256")
