@@ -22,7 +22,7 @@
     <!-- stylesheet-->
     <link rel="stylesheet" href="./css/lib/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="./css/style.css?v=1">
+    <link rel="stylesheet" href="./css/style.css?v=2">
   </head>
   <body data-page-id="index">
     <div class="wrapper">
@@ -34,6 +34,10 @@
           <div class="page-content">
             <audio data-js-output autoplay></audio>
             <canvas class="stage" data-js-stage width="256" height="256"></canvas>
+            <div class="config">
+              <p>出力調整</p>
+              <input data-js-gain type="range" value="1" min="0" max="1" step="0.05">
+            </div>
           </div>
         </main>
       </div>
@@ -42,7 +46,7 @@
     <script src="./js/lib/jquery.min.js"></script>
     <script src="./js/lib/lodash.min.js"></script>
     <script src="./js/lib/material.min.js"></script>
-    <script src="./js/script.js?v=8"></script>
+    <script src="./js/script.js?v=9"></script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

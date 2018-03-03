@@ -107,3 +107,7 @@ html.is-pc .wrapper {
   min-width: 1200px;
   min-width: 12rem;
   overflow: hidden; }
+
+.page-content {
+  margin: 20px;
+  margin: 0.2rem; }

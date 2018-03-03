@@ -3413,6 +3413,8 @@ var AnalyticSignal = function () {
   _createClass(AnalyticSignal, [{
     key: 'initialize',
     value: function initialize() {
+      var _this = this;
+
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var stageElm = this.stageElm = opts.stageElm;
@@ -3420,6 +3422,14 @@ var AnalyticSignal = function () {
       var sampleRate = this.sampleRate = opts.sampleRate;
 
       var context = this.context = stageElm.getContext('2d');
+
+      var $gain = $('[data-js-gain]');
+
+      this.gain = Number($gain.val());
+
+      $gain.on('input', function (evt) {
+        _this.gain = Number($(evt.target).val());
+      });
     }
   }, {
     key: 'draw',
@@ -3439,6 +3449,8 @@ var AnalyticSignal = function () {
 
       var ghostLen = 10;
 
+      var gain = this.gain;
+
       for (var i = _config.kernelLen, l = timeDomainData.length - _config.kernelLen; i < l; i++) {
         var hilbTmp = 0;
         for (var k = -_config.kernelLen; k <= _config.kernelLen; k++) {
@@ -3446,8 +3458,8 @@ var AnalyticSignal = function () {
         }
         var re = (0, _util.normalize)(timeDomainData[i]);
         var im = hilbTmp;
-        var x = _config.width / 2 + _config.amp * re;
-        var y = _config.height / 2 - _config.amp * im;
+        var x = _config.width / 2 + _config.amp * re * gain;
+        var y = _config.height / 2 - _config.amp * im * gain;
 
         var volume = (0, _util.norm)(re, im);
 
