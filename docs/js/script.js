@@ -3509,8 +3509,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 var kernelLen = exports.kernelLen = 127;
 var amp = exports.amp = 100;
-var width = exports.width = 256;
-var height = exports.height = 256;
+var width = exports.width = 512;
+var height = exports.height = 512;
 
 },{}],9:[function(require,module,exports){
 'use strict';
