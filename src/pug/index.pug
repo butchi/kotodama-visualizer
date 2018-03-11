@@ -4,16 +4,7 @@ append config-block
   - pageId = 'index'
 
 block content-block
-  .mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer
-    .mdl-layout__drawer
-      span.mdl-layout-title コトダマ可視化デモ
-      nav.mdl-navigation
-        a.mdl-navigation__link(href='./')
-          i.material-icons
-            | mic
-          | マイク入力
-
-    main.mdl-layout__content
-      .page-content
-        audio(data-js-output, autoplay)
-        canvas.stage(data-js-stage, width="256", height="256")
+  main
+    .page-content
+      audio(data-js-output, autoplay)
+      .stage(data-js-stage)
