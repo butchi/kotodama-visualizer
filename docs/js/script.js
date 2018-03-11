@@ -3471,6 +3471,12 @@ var AnalyticSignal = function () {
           context.lineTo(pt.x, pt.y);
           context.lineTo(_config.width / 2, _config.height / 2);
           context.fill();
+
+          context.beginPath();
+          context.strokeStyle = '#ffffff';
+          context.lineTo(prev.x, prev.y);
+          context.lineTo(pt.x, pt.y);
+          context.stroke();
         }
 
         prev.x = pt.x;
