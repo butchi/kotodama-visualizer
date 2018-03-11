@@ -107,3 +107,23 @@ html.is-pc .wrapper {
   min-width: 1200px;
   min-width: 12rem;
   overflow: hidden; }
+
+@-webkit-keyframes fuwafuwa {
+  0% {
+    -webkit-transform: translateY(-10px);
+            transform: translateY(-10px); }
+  100% {
+    -webkit-transform: translateY(0px);
+            transform: translateY(0px); } }
+
+@keyframes fuwafuwa {
+  0% {
+    -webkit-transform: translateY(-10px);
+            transform: translateY(-10px); }
+  100% {
+    -webkit-transform: translateY(0px);
+            transform: translateY(0px); } }
+
+.tama {
+  -webkit-animation: fuwafuwa 3s ease-in-out infinite alternate;
+          animation: fuwafuwa 3s ease-in-out infinite alternate; }

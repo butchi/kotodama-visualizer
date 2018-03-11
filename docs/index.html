@@ -22,27 +22,22 @@
     <!-- stylesheet-->
     <link rel="stylesheet" href="./css/lib/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="./css/style.css?v=1">
+    <link rel="stylesheet" href="./css/style.css?v=2">
   </head>
   <body data-page-id="index">
     <div class="wrapper">
-      <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
-        <div class="mdl-layout__drawer"><span class="mdl-layout-title">コトダマ可視化デモ</span>
-          <nav class="mdl-navigation"><a class="mdl-navigation__link" href="./"><i class="material-icons">mic</i>マイク入力</a><a class="mdl-navigation__link" href="./?audio=vivaldi-spring">ヴィヴァルディ 四季より『春』</a><a class="mdl-navigation__link" href="./?audio=chopin-nocturnes">ショパン『夜想曲第二番』</a><a class="mdl-navigation__link" href="./?audio=satie-je-te-veux">サティ『Je te veux』</a></nav>
+      <main>
+        <div class="page-content">
+          <audio data-js-output autoplay></audio>
+          <div class="stage" data-js-stage></div>
         </div>
-        <main class="mdl-layout__content">
-          <div class="page-content">
-            <audio data-js-output autoplay></audio>
-            <canvas class="stage" data-js-stage width="256" height="256"></canvas>
-          </div>
-        </main>
-      </div>
+      </main>
     </div>
     <!-- javascript-->
     <script src="./js/lib/jquery.min.js"></script>
     <script src="./js/lib/lodash.min.js"></script>
     <script src="./js/lib/material.min.js"></script>
-    <script src="./js/script.js?v=8"></script>
+    <script src="./js/script.js?v=9"></script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

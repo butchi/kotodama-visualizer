@@ -3416,10 +3416,24 @@ var AnalyticSignal = function () {
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var stageElm = this.stageElm = opts.stageElm;
+
+      var tamaElm = this.tamaElm = document.createElement('canvas');
+      tamaElm.width = _config.width;
+      tamaElm.height = _config.height;
+      tamaElm.classList.add('tama');
+      stageElm.appendChild(tamaElm);
+
+      var offsetX = Math.floor(Math.random() * 1280);
+      var offsetY = Math.floor(Math.random() * 720);
+
+      tamaElm.style.position = 'absolute';
+      tamaElm.style.left = offsetX + 'px';
+      tamaElm.style.top = offsetY + 'px';
+
       var fftSize = this.fftSize = opts.fftSize;
       var sampleRate = this.sampleRate = opts.sampleRate;
 
-      var context = this.context = stageElm.getContext('2d');
+      var context = this.context = tamaElm.getContext('2d');
     }
   }, {
     key: 'draw',
@@ -3458,9 +3472,6 @@ var AnalyticSignal = function () {
       var opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
 
       var prev = { x: null, y: null };
-
-      context.fillStyle = '#fff';
-      context.fillRect(0, 0, _config.width, _config.height);
 
       ptArr.forEach(function (pt) {
         if (prev.x != null && prev.y != null) {
@@ -3811,11 +3822,25 @@ exports.default = function () {
         var fftSize = analyser.fftSize;
         var sampleRate = audioContext.sampleRate;
 
-        var analyticSignal = new _analyticSignal2.default({
-          stageElm: stageElm,
-          fftSize: fftSize,
-          sampleRate: sampleRate
-        });
+        var kotodamaArr = [];
+
+        var analyticSignal = void 0;
+
+        var addTama = function addTama() {
+          analyticSignal = new _analyticSignal2.default({
+            stageElm: stageElm,
+            fftSize: fftSize,
+            sampleRate: sampleRate
+          });
+
+          kotodamaArr.push(analyticSignal);
+        };
+
+        setInterval(function () {
+          addTama();
+        }, 3000);
+
+        addTama();
 
         var ticker = function ticker() {
           cnt++;
@@ -3838,88 +3863,7 @@ exports.default = function () {
     }
   };
 
-  var initializeWithAudio = function initializeWithAudio(_ref) {
-    var audioName = _ref.audioName;
-
-    var url = 'audio/' + audioName + '.mp3';
-
-    var stageElm = document.querySelector('[data-js-stage]');
-    var $btnPlay = $('[data-js-btn-play]');
-
-    var frequencyData = void 0;
-    var timeDomainData = void 0;
-
-    var cnt = 0;
-
-    var audioContext = new AudioContext();
-
-    var decodeAudioDataHandler = function decodeAudioDataHandler(buffer) {
-      if (!buffer) {
-        console.log('error');
-        return;
-      }
-      var sourceNode = audioContext.createBufferSource(); // AudioBufferSourceNodeを作成
-      sourceNode.buffer = buffer; // 取得した音声データ(バッファ)を音源に設定
-      var analyser = audioContext.createAnalyser(); // AnalyserNodeを作成
-
-      frequencyData = new Uint8Array(analyser.frequencyBinCount);
-      timeDomainData = new Uint8Array(analyser.frequencyBinCount);
-
-      sourceNode.connect(analyser); // AudioBufferSourceNodeをAnalyserNodeに接続
-      analyser.connect(audioContext.destination); // AnalyserNodeをAudioDestinationNodeに接続
-      sourceNode.start(0); // 再生開始
-
-      var fftSize = analyser.fftSize;
-      var sampleRate = audioContext.sampleRate;
-
-      var analyticSignal = new _analyticSignal2.default({
-        stageElm: stageElm,
-        fftSize: fftSize,
-        sampleRate: sampleRate
-      });
-
-      var ticker = function ticker() {
-        cnt++;
-
-        analyser.getByteFrequencyData(frequencyData);
-        analyser.getByteTimeDomainData(timeDomainData);
-
-        analyticSignal.draw({
-          frequencyData: frequencyData,
-          timeDomainData: timeDomainData
-        });
-
-        requestAnimationFrame(ticker);
-      };
-
-      ticker();
-    };
-
-    var audioLoadHandler = function audioLoadHandler(response) {
-      // 取得したデータをデコードする。
-      audioContext.decodeAudioData(response, decodeAudioDataHandler, function (error) {
-        console.log('decodeAudioData error');
-      });
-    };
-
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-
-    request.onload = function () {
-      audioLoadHandler(request.response);
-    };
-
-    request.send();
-  };
-
-  var queryString = _qs2.default.parse(location.search.substring(1));
-  if (queryString.audio) {
-    var audioName = queryString.audio;
-    initializeWithAudio({ audioName: audioName });
-  } else {
-    initializeWithUserMedia();
-  }
+  initializeWithUserMedia();
 };
 
 },{"../module/analytic-signal":7,"../module/ns":10,"qs":3}],15:[function(require,module,exports){
