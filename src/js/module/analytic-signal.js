@@ -9,10 +9,24 @@ export default class AnalyticSignal {
 
   initialize(opts = {}) {
     const stageElm = this.stageElm = opts.stageElm;
+
+    const tamaElm = this.tamaElm = document.createElement('canvas');
+    tamaElm.width = width;
+    tamaElm.height = height;
+    tamaElm.classList.add('tama');
+    stageElm.appendChild(tamaElm);
+
+    const offsetX = Math.floor(Math.random() * 1280);
+    const offsetY = Math.floor(Math.random() * 720);
+
+    tamaElm.style.position = 'absolute';
+    tamaElm.style.left = `${offsetX}px`;
+    tamaElm.style.top = `${offsetY}px`;
+
     const fftSize = this.fftSize = opts.fftSize;
     const sampleRate = this.sampleRate = opts.sampleRate;
 
-    const context = this.context = stageElm.getContext('2d');
+    const context = this.context = tamaElm.getContext('2d');
   }
 
   draw({ frequencyData, timeDomainData }) {
@@ -48,9 +62,6 @@ export default class AnalyticSignal {
 
 
     const prev = { x: null, y: null };
-
-    context.fillStyle = '#fff';
-    context.fillRect(0, 0, width, height);
 
     ptArr.forEach((pt) => {
       if (prev.x != null && prev.y != null) {

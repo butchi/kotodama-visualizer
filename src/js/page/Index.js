@@ -36,11 +36,25 @@ export default () => {
           const fftSize = analyser.fftSize;
           const sampleRate = audioContext.sampleRate;
 
-          const analyticSignal = new AnalyticSignal({
-            stageElm,
-            fftSize,
-            sampleRate,
-          });
+          const kotodamaArr = [];
+
+          let analyticSignal;
+
+          const addTama = () => {
+            analyticSignal = new AnalyticSignal({
+              stageElm,
+              fftSize,
+              sampleRate,
+            });
+
+            kotodamaArr.push(analyticSignal);
+          };
+
+          setInterval(() => {
+            addTama()
+          }, 3000);
+
+          addTama();
 
           const ticker = () => {
             cnt++;

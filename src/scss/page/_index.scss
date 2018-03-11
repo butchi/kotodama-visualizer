@@ -1,0 +1,8 @@
+@keyframes fuwafuwa {
+    0% { transform:translateY( -10px); }
+  100% { transform:translateY(  0px); }
+}
+
+.tama {
+  animation: fuwafuwa 3s ease-in-out infinite alternate;
+}
