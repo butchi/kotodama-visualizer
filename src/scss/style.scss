@@ -1,11 +1,15 @@
 // reset css
-@import 'node_modules/reset.css/reset.css';
+@import '../../node_modules/reset.css/reset.css';
 
 // config
-@import 'function', 'variable', 'mixin', 'keyframes';
+@import 'function';
+@import 'variable';
+@import 'mixin';
+@import 'keyframes';
 
 // modules
-@import 'module/*';
+@import 'module/_common';
+@import 'module/_wrapper';
 
 // pages
-@import 'page/*';
+@import 'page/_index';
