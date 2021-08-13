@@ -11,49 +11,50 @@ let timeDomainData;
 
 let cnt = 0;
 
-const initializeWithUserMedia = () => {
-  navigator.mediaDevices.getUserMedia({audio : true})
-    .then(stream => {
-      const audioElm = document.querySelector('[data-js-output]');
+async function initializeWithUserMedia(constraints) {
+  let stream = null;
 
-      audioElm.srcObject = stream;
-      audioElm.volume = 0;
-      const audioContext = new AudioContext();
-      const mediastreamsource = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-      timeDomainData = new Uint8Array(analyser.frequencyBinCount);
-      mediastreamsource.connect(analyser);
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-      const fftSize = analyser.fftSize;
-      const sampleRate = audioContext.sampleRate;
+    const audioElm = document.querySelector('[data-js-output]');
 
-      const analyticSignal = new AnalyticSignal({
-        stageElm,
-        fftSize,
-        sampleRate,
+    audioElm.srcObject = stream;
+    audioElm.volume = 0;
+    const audioContext = new AudioContext();
+    const mediastreamsource = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+    mediastreamsource.connect(analyser);
+
+    const fftSize = analyser.fftSize;
+    const sampleRate = audioContext.sampleRate;
+
+    const analyticSignal = new AnalyticSignal({
+      stageElm,
+      fftSize,
+      sampleRate,
+    });
+
+    const ticker = () => {
+      cnt++;
+
+      analyser.getByteFrequencyData(frequencyData);
+      analyser.getByteTimeDomainData(timeDomainData);
+
+      analyticSignal.draw({
+        frequencyData,
+        timeDomainData,
       });
 
-      const ticker = () => {
-        cnt++;
+      requestAnimationFrame(ticker);
+    }
 
-        analyser.getByteFrequencyData(frequencyData);
-        analyser.getByteTimeDomainData(timeDomainData);
-
-        analyticSignal.draw({
-          frequencyData,
-          timeDomainData,
-        });
-
-        requestAnimationFrame(ticker);
-      }
-
-      ticker();
-    })
-    .catch(function(err) {
-      console.log(err);
-    })
-  ;
+    ticker();
+  } catch(err) {
+    console.log(err);
+  }
 };
 
 const initializeWithAudio = ({ audioName }) => {
@@ -133,8 +134,9 @@ $('body').one('click', _ => {
   const queryString = qs.parse(location.search.substring(1));
   if (queryString.audio) {
     const audioName = queryString.audio;
-    initializeWithAudio({ audioName });
+
+    initializeWithAudio();
   } else {
-    initializeWithUserMedia();
+    initializeWithUserMedia({ audio: true });
   }
 });
