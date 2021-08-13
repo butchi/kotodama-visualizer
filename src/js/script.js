@@ -61,7 +61,6 @@ const initializeWithAudio = ({ audioName }) => {
   const url = `audio/${audioName}.mp3`;
 
   const stageElm = document.querySelector('[data-js-stage]');
-  const $btnPlay = $('[data-js-btn-play]');
 
   let frequencyData;
   let timeDomainData;
@@ -130,7 +129,9 @@ const initializeWithAudio = ({ audioName }) => {
   request.send();
 }
 
-$('body').one('click', _ => {
+$btnPlay.one('click', _ => {
+  $btnPlay.hide();
+
   const queryString = qs.parse(location.search.substring(1));
   if (queryString.audio) {
     const audioName = queryString.audio;
