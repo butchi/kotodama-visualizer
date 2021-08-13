@@ -130,13 +130,14 @@ const initializeWithAudio = ({ audioName }) => {
 }
 
 $btnPlay.one('click', _ => {
+  let audioName;
   $btnPlay.hide();
 
   const queryString = qs.parse(location.search.substring(1));
   if (queryString.audio) {
-    const audioName = queryString.audio;
+    audioName = queryString.audio;
 
-    initializeWithAudio();
+    initializeWithAudio({ audioName });
   } else {
     initializeWithUserMedia({ audio: true });
   }
