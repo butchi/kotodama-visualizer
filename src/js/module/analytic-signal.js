@@ -1,7 +1,19 @@
 import $ from 'jquery';
+import * as dat from 'dat.gui';
 import ns from './ns';
-import { kernelLen, amp, width, height } from '../module/config';
 import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
+
+const param = {
+  kernelLen: 127,
+  amp: 128,
+  width: 256,
+  height: 256,
+  freqSync: 'stroke',
+  fillColor: '#000000',
+  fillAlpha: 0,
+  strokeColor: '#ffffff',
+  strokeAlpha: 1,
+};
 
 export default class AnalyticSignal {
   constructor(opts = {}) {
@@ -9,19 +21,24 @@ export default class AnalyticSignal {
   }
 
   initialize(opts = {}) {
+    const gui = new dat.GUI();
+
+    $('main').append(gui.domElement);
+
+    gui.add(param, 'amp', 0, 512);
+    gui.add(param, 'width', 0, 2048);
+    gui.add(param, 'height', 0, 2048);
+    gui.add(param, 'freqSync', ['none', 'fill', 'stroke']);
+    gui.addColor(param, 'fillColor', 'color');
+    gui.add(param, 'fillAlpha', 0, 1, 0.01);
+    gui.addColor(param, 'strokeColor', 'color');
+    gui.add(param, 'strokeAlpha', 0, 1, 0.01);
+
     const stageElm = this.stageElm = opts.stageElm;
     const fftSize = this.fftSize = opts.fftSize;
     const sampleRate = this.sampleRate = opts.sampleRate;
 
     const context = this.context = stageElm.getContext('2d');
-
-    const $gain = $('[data-js-gain]');
-
-    this.gain = Number($gain.val());
-
-    $gain.on('input', (evt) => {
-      this.gain = Number($(evt.target).val());
-    });
   }
 
   draw({ frequencyData, timeDomainData }) {
@@ -37,21 +54,33 @@ export default class AnalyticSignal {
 
     const ghostLen = 10;
 
-    const gain = this.gain;
+    let width = param.width;
+    let height = param.height;
 
-    for (let i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
+    let amp = param.amp;
+
+    this.stageElm.width = width;
+    this.stageElm.height = height;
+    $(this.stageElm).css({
+      width,
+      height,
+      "margin-left": - width / 2,
+      "margin-top": - height / 2,
+    });
+
+    for (let i = param.kernelLen, l = timeDomainData.length - param.kernelLen; i < l; i++) {
       let hilbTmp = 0;
-      for (let k = - kernelLen; k <= kernelLen; k++) {
+      for (let k = - param.kernelLen; k <= param.kernelLen; k++) {
         hilbTmp += inv(k) * (normalize(timeDomainData[i + k]) || 0);
       }
       const re = normalize(timeDomainData[i]);
       const im = hilbTmp;
-      const x = width / 2 + amp * re * gain;
-      const y = height / 2 - amp * im * gain;
+      const x = width / 2 + amp * re;
+      const y = height / 2 - amp * im;
 
       const volume = norm(re, im);
 
-      ptArr.push({re, im, x, y, hue, volume, amp});
+      ptArr.push({ re, im, x, y, hue, volume, amp });
     }
 
     const volAvg = _.meanBy(ptArr, 'volume');
@@ -66,15 +95,15 @@ export default class AnalyticSignal {
     ptArr.forEach((pt) => {
       if (prev.x != null && prev.y != null) {
         context.beginPath();
-        context.fillStyle = rgba;
-        context.moveTo(width / 2,  height / 2);
+        context.fillStyle = param.freqSync === 'fill' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
+        context.moveTo(width / 2, height / 2);
         context.lineTo(prev.x, prev.y);
         context.lineTo(pt.x, pt.y);
-        context.lineTo(width / 2,  height / 2);
+        context.lineTo(width / 2, height / 2);
         context.fill();
 
         context.beginPath();
-        context.strokeStyle = '#ffffff';
+        context.strokeStyle = param.freqSync === 'stroke' ? rgba : getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
         context.lineTo(prev.x, prev.y);
         context.lineTo(pt.x, pt.y);
         context.stroke();
