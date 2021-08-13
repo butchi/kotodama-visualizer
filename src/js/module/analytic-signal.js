@@ -13,6 +13,14 @@ export default class AnalyticSignal {
     const sampleRate = this.sampleRate = opts.sampleRate;
 
     const context = this.context = stageElm.getContext('2d');
+
+    const $gain = $('[data-js-gain]');
+
+    this.gain = Number($gain.val());
+
+    $gain.on('input', (evt) => {
+      this.gain = Number($(evt.target).val());
+    });
   }
 
   draw({ frequencyData, timeDomainData }) {
@@ -28,6 +36,8 @@ export default class AnalyticSignal {
 
     const ghostLen = 10;
 
+    const gain = this.gain;
+
     for (let i = kernelLen, l = timeDomainData.length - kernelLen; i < l; i++) {
       let hilbTmp = 0;
       for (let k = - kernelLen; k <= kernelLen; k++) {
@@ -35,8 +45,8 @@ export default class AnalyticSignal {
       }
       const re = normalize(timeDomainData[i]);
       const im = hilbTmp;
-      const x = width / 2 + amp * re;
-      const y = height / 2 - amp * im;
+      const x = width / 2 + amp * re * gain;
+      const y = height / 2 - amp * im * gain;
 
       const volume = norm(re, im);
 
