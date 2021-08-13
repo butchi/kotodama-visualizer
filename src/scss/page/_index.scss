@@ -1,5 +1,18 @@
 .page-content {
-  margin: px(20);
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+.stage {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
 }
 
 .cover {
