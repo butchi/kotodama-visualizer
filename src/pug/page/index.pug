@@ -23,11 +23,6 @@ block content-block
       .page-content
         audio(data-js-output, autoplay)
         canvas.stage(data-js-stage, width="256", height="256")
-
-        .config
-          p
-            | 出力調整
-          input(data-js-gain, type="range", value="1", min="0", max="1", step="0.05")
       .cover(data-js-btn-play)
         .icon-play.material-icons
           | play_arrow
