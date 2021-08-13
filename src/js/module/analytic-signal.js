@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import ns from './ns';
 import { kernelLen, amp, width, height } from '../module/config';
 import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
