@@ -21,6 +21,7 @@
     "copy-webpack-plugin": "^6.1.0",
     "css-loader": "^0.28.11",
     "css-mqpacker": "^6.0.2",
+    "dat.gui": "^0.7.7",
     "extract-text-webpack-plugin": "next",
     "file-loader": "^6.1.0",
     "glob": "^7.1.2",
