@@ -6,8 +6,6 @@ import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, g
 const param = {
   kernelLen: 127,
   amp: 128,
-  width: 256,
-  height: 256,
   freqSync: 'stroke',
   fillColor: '#000000',
   fillAlpha: 0,
