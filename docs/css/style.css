@@ -107,10 +107,8 @@ html.is-pc .wrapper {
 
 .stage {
   position: absolute;
-  left: 50%;
-  margin-left: -2.56rem;
-  top: 50%;
-  margin-top: -2.56rem; }
+  left: 0;
+  top: 0; }
 
 .cover {
   position: absolute;
