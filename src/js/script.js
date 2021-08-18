@@ -30,8 +30,8 @@ async function initializeWithUserMedia(constraints) {
     const audioContext = new AudioContext();
     const mediastreamsource = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-    timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+    const frequencyData = new Float32Array(analyser.frequencyBinCount);
+    timeDomainData = new Float32Array(analyser.frequencyBinCount);
     mediastreamsource.connect(analyser);
 
     const fftSize = analyser.fftSize;
@@ -46,8 +46,8 @@ async function initializeWithUserMedia(constraints) {
     const ticker = () => {
       cnt++;
 
-      analyser.getByteFrequencyData(frequencyData);
-      analyser.getByteTimeDomainData(timeDomainData);
+      analyser.getFloatFrequencyData(frequencyData);
+      analyser.getFloatTimeDomainData(timeDomainData);
 
       analyticSignal.draw({
         frequencyData,
@@ -103,8 +103,8 @@ const initializeWithAudio = ({ audioName }) => {
     const ticker = () => {
       cnt++;
 
-      analyser.getByteFrequencyData(frequencyData);
-      analyser.getByteTimeDomainData(timeDomainData);
+      analyser.getFloatFrequencyData(frequencyData);
+      analyser.getFloatTimeDomainData(timeDomainData);
 
       analyticSignal.draw({
         frequencyData,

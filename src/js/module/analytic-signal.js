@@ -5,7 +5,7 @@ import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, g
 
 const param = {
   kernelLen: 127,
-  amp: 128,
+  amp: 512,
   freqSync: 'stroke',
   fillColor: '#000000',
   fillAlpha: 0,
@@ -25,7 +25,7 @@ export default class AnalyticSignal {
     gui.domElement.style.position = 'absolute';
     gui.domElement.style.right = 0;
 
-    gui.add(param, 'amp', 0, 512);
+    gui.add(param, 'amp', 0, 2048);
     gui.add(param, 'freqSync', ['none', 'fill', 'stroke']);
     gui.addColor(param, 'fillColor', 'color');
     gui.add(param, 'fillAlpha', 0, 1, 0.01);
@@ -60,9 +60,9 @@ export default class AnalyticSignal {
     for (let i = param.kernelLen, l = timeDomainData.length - param.kernelLen; i < l; i++) {
       let hilbTmp = 0;
       for (let k = - param.kernelLen; k <= param.kernelLen; k++) {
-        hilbTmp += inv(k) * (normalize(timeDomainData[i + k]) || 0);
+        hilbTmp += inv(k) * (timeDomainData[i + k] || 0);
       }
-      const re = normalize(timeDomainData[i]);
+      const re = timeDomainData[i];
       const im = hilbTmp;
       const x = width / 2 + amp * re;
       const y = height / 2 - amp * im;
