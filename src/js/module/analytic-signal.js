@@ -22,10 +22,10 @@ export default class AnalyticSignal {
     const gui = new dat.GUI();
 
     $('main').append(gui.domElement);
+    gui.domElement.style.position = 'absolute';
+    gui.domElement.style.right = 0;
 
     gui.add(param, 'amp', 0, 512);
-    gui.add(param, 'width', 0, 2048);
-    gui.add(param, 'height', 0, 2048);
     gui.add(param, 'freqSync', ['none', 'fill', 'stroke']);
     gui.addColor(param, 'fillColor', 'color');
     gui.add(param, 'fillAlpha', 0, 1, 0.01);
@@ -40,6 +40,9 @@ export default class AnalyticSignal {
   }
 
   draw({ frequencyData, timeDomainData }) {
+    const width = $(window).width();
+    const height = $(window).height();
+
     const context = this.context;
 
     const hue = this.hue(frequencyData);
@@ -52,19 +55,7 @@ export default class AnalyticSignal {
 
     const ghostLen = 10;
 
-    let width = param.width;
-    let height = param.height;
-
     let amp = param.amp;
-
-    this.stageElm.width = width;
-    this.stageElm.height = height;
-    $(this.stageElm).css({
-      width,
-      height,
-      "margin-left": - width / 2,
-      "margin-top": - height / 2,
-    });
 
     for (let i = param.kernelLen, l = timeDomainData.length - param.kernelLen; i < l; i++) {
       let hilbTmp = 0;
