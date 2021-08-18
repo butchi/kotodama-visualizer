@@ -84,8 +84,8 @@ const initializeWithAudio = ({ audioName }) => {
     sourceNode.buffer = buffer; // 取得した音声データ(バッファ)を音源に設定
     const analyser = audioContext.createAnalyser(); // AnalyserNodeを作成
 
-    frequencyData = new Uint8Array(analyser.frequencyBinCount);
-    timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+    frequencyData = new Float32Array(analyser.frequencyBinCount);
+    timeDomainData = new Float32Array(analyser.frequencyBinCount);
 
     sourceNode.connect(analyser); // AudioBufferSourceNodeをAnalyserNodeに接続
     analyser.connect(audioContext.destination);  // AnalyserNodeをAudioDestinationNodeに接続
