@@ -37,6 +37,10 @@ export default class AnalyticSignal {
     const sampleRate = this.sampleRate = opts.sampleRate;
 
     const context = this.context = stageElm.getContext('2d');
+
+    const videoElm = document.querySelector('video');
+    var str = this.stageElm.captureStream(30);
+    videoElm.srcObject = str;
   }
 
   draw({ frequencyData, timeDomainData }) {
@@ -44,7 +48,7 @@ export default class AnalyticSignal {
     const height = $(window).height();
 
     const context = this.context;
-
+  
     const hue = this.hue(frequencyData);
 
     const rgba = getHsvColor(hue || 0, 0.8, 0.5).alpha(0.3).css();

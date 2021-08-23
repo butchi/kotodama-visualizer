@@ -22,7 +22,8 @@ block content-block
     main.mdl-layout__content
       .page-content
         audio(data-js-output, autoplay)
-        canvas.stage(data-js-stage, width="256", height="256")
+        canvas.stage(data-js-canvas, width="256", height="256")
+        video(data-js-stage, width="256", height="256", autoplay, controls)
       .cover(data-js-btn-play)
         .icon-play.material-icons
           | play_arrow
