@@ -108,7 +108,8 @@ html.is-pc .wrapper {
 .stage {
   position: absolute;
   left: 0;
-  top: 0; }
+  top: 0;
+  visibility: hidden; }
 
 .cover {
   position: absolute;
