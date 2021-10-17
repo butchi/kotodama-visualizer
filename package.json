@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Kotodama visualizer.",
   "engines": {
-    "node": ">=6.9.1"
+    "node": "14.18.1"
   },
   "scripts": {
     "build": "webpack --mode production --progress",
