@@ -11,6 +11,9 @@ const param = {
   fillAlpha: 0,
   strokeColor: '#ffffff',
   strokeAlpha: 1,
+  line: true,
+  pointSize: 1,
+  point: true,
 };
 
 export default class AnalyticSignal {
@@ -26,11 +29,14 @@ export default class AnalyticSignal {
     gui.domElement.style.right = 0;
 
     gui.add(param, 'amp', 0, 2048);
-    gui.add(param, 'freqSync', ['none', 'fill', 'stroke']);
+    gui.add(param, 'freqSync', ['none', 'fill', 'stroke', 'point']);
     gui.addColor(param, 'fillColor', 'color');
     gui.add(param, 'fillAlpha', 0, 1, 0.01);
     gui.addColor(param, 'strokeColor', 'color');
     gui.add(param, 'strokeAlpha', 0, 1, 0.01);
+    gui.add(param, 'line');
+    gui.add(param, 'point');
+    gui.add(param, 'pointSize', 0, 99, 0.01);
 
     const stageElm = this.stageElm = opts.stageElm;
     const fftSize = this.fftSize = opts.fftSize;
@@ -87,19 +93,28 @@ export default class AnalyticSignal {
 
     ptArr.forEach((pt) => {
       if (prev.x != null && prev.y != null) {
-        context.beginPath();
-        context.fillStyle = param.freqSync === 'fill' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
-        context.moveTo(width / 2, height / 2);
-        context.lineTo(prev.x, prev.y);
-        context.lineTo(pt.x, pt.y);
-        context.lineTo(width / 2, height / 2);
-        context.fill();
+        if (param.line) {
+          context.beginPath();
+          context.fillStyle = param.freqSync === 'fill' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
+          context.moveTo(width / 2, height / 2);
+          context.lineTo(prev.x, prev.y);
+          context.lineTo(pt.x, pt.y);
+          context.lineTo(width / 2, height / 2);
+          context.fill();
+  
+          context.beginPath();
+          context.strokeStyle = param.freqSync === 'stroke' ? rgba : getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
+          context.lineTo(prev.x, prev.y);
+          context.lineTo(pt.x, pt.y);
+          context.stroke();
+        }
 
-        context.beginPath();
-        context.strokeStyle = param.freqSync === 'stroke' ? rgba : getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
-        context.lineTo(prev.x, prev.y);
-        context.lineTo(pt.x, pt.y);
-        context.stroke();
+        if (param.point) {
+          context.beginPath();
+          context.fillStyle = param.freqSync === 'point' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
+          context.arc(pt.x, pt.y, param.pointSize, 0, Math.PI * 2);
+          context.fill();
+        }
       }
 
       prev.x = pt.x;
