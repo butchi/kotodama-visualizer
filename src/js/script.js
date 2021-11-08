@@ -69,7 +69,7 @@ async function initializeWithUserMedia(constraints) {
 const initializeWithAudio = ({ audioName }) => {
   const url = `audio/${audioName}.mp3`;
 
-  const stageElm = document.querySelector('[data-js-stage]');
+  const stageElm = document.querySelector('canvas');
 
   let frequencyData;
   let timeDomainData;
