@@ -36,7 +36,7 @@ export default class AnalyticSignal {
     gui.add(param, 'strokeAlpha', 0, 1, 0.01);
     gui.add(param, 'line');
     gui.add(param, 'point');
-    gui.add(param, 'pointSize', 0, 99, 0.01);
+    gui.add(param, 'pointSize', 0, 9, 0.01);
 
     const stageElm = this.stageElm = opts.stageElm;
     const fftSize = this.fftSize = opts.fftSize;
