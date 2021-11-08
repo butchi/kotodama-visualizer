@@ -34,7 +34,7 @@ async function initializeWithUserMedia(constraints) {
     const mediastreamsource = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();
     const frequencyData = new Float32Array(analyser.frequencyBinCount);
-    timeDomainData = new Float32Array(analyser.frequencyBinCount);
+    const timeDomainData = new Float32Array(analyser.frequencyBinCount);
     mediastreamsource.connect(analyser);
 
     const fftSize = analyser.fftSize;
