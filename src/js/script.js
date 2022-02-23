@@ -4,7 +4,6 @@ import AnalyticSignal from './module/analytic-signal';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
 
-const contentElm = document.querySelector('.page-content');
 const stageElm = document.querySelector('[data-js-canvas]');
 const videoElm = document.querySelector('[data-js-stage]');
 const btnPlayElm = document.querySelector('[data-js-btn-play]');
@@ -61,7 +60,7 @@ async function initializeWithUserMedia(constraints) {
     }
 
     ticker();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 };
