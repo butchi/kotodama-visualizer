@@ -7,7 +7,7 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext || window
 const contentElm = document.querySelector('.page-content');
 const stageElm = document.querySelector('[data-js-canvas]');
 const videoElm = document.querySelector('[data-js-stage]');
-const $btnPlay = $('[data-js-btn-play]');
+const btnPlayElm = document.querySelector('[data-js-btn-play]');
 
 let timeDomainData;
 
@@ -138,9 +138,9 @@ const initializeWithAudio = ({ audioName }) => {
   request.send();
 }
 
-$btnPlay.one('click', _ => {
+$(btnPlayElm).one('click', _ => {
   let audioName;
-  $btnPlay.hide();
+  $(btnPlayElm).hide();
 
   const queryString = qs.parse(location.search.substring(1));
   if (queryString.audio) {
