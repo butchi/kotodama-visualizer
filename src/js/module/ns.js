@@ -3,6 +3,6 @@
  * ネームスペース以下の変数にアクセスしたいときは各クラスでこれをimportする
  */
 
-window.App = window.App || {};
-const ns = window.App;
+globalThis.App = globalThis.App || {};
+const ns = globalThis.App;
 export default ns;

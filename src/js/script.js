@@ -146,6 +146,8 @@ $(btnPlayElm).one('click', _ => {
     audioName = queryString.audio;
 
     initializeWithAudio({ audioName });
+  } else if (queryString.display) {
+    initializeWithUserMedia({ video: true, audio: true });
   } else {
     initializeWithUserMedia({ audio: true });
   }

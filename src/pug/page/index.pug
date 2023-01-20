@@ -14,6 +14,10 @@ block content-block
           i.material-icons
             | mic
           | マイク入力
+        a.mdl-navigation__link(href='./?display=true')
+          i.material-icons
+            | speaker
+          | ページ外音声
         a.mdl-navigation__link(href='./?audio=vivaldi-spring')
           | ヴィヴァルディ 四季より『春』
         a.mdl-navigation__link(href='./?audio=chopin-nocturnes')
@@ -23,6 +27,9 @@ block content-block
 
     main.mdl-layout__content
       .page-content
+        //- .console
+        //- .point-wrapper
+        //-   .point
         audio(data-js-output, autoplay)
         canvas.stage(data-js-canvas, width="256", height="256")
         video(data-js-stage, width="256", height="256", autoplay, controls)
