@@ -130,3 +130,9 @@ html.is-pc .wrapper {
     margin-top: -50px;
     font-size: 100px;
     color: red; }
+
+.console {
+  position: fixed;
+  left: 0rem;
+  top: 0.65rem;
+  font-size: 0.15rem; }
