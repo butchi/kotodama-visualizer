@@ -16,6 +16,7 @@ const param = {
   pointSize: 1,
   point: false,
   normalize: true,
+  output: 'video',
 };
 
 export default class AnalyticSignal {
@@ -43,6 +44,16 @@ export default class AnalyticSignal {
     gui.add(param, 'point');
     gui.add(param, 'pointSize', 0, 9, 0.01);
     gui.add(param, 'normalize');
+    gui.add(param, 'output', ['video', 'canvas']).onChange(val => {
+      if (val === '') {
+      } else if (val === 'video') {
+        stageElm.style.visibility = 'hidden'
+        videoElm.style.visibility = 'visible'
+      } else if (val === 'canvas') {
+        videoElm.style.visibility = 'hidden'
+        stageElm.style.visibility = 'visible'
+      }
+    });
 
     const stageElm = this.stageElm = opts.stageElm;
     const fftSize = this.fftSize = opts.fftSize;
