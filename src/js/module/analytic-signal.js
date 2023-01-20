@@ -133,10 +133,15 @@ export default class AnalyticSignal {
     const sampleRate = this.sampleRate;
     const fftSize = this.fftSize;
 
-    const hzUnit = sampleRate / fftSize; // frequencyData 1つあたりの周波数
+    // frequencyData 1つあたりの周波数
+    const hzUnit = sampleRate / fftSize;
+
     const hz = maxIndexOf(frequencyData) * hzUnit;
-    const baseHz = 243; // C4
-    const octave = Math.log(hz/baseHz) / Math.log(2);
+
+    // ベースとなる音高はC4
+    const baseHz = 243;
+
+    const octave = Math.log(hz / baseHz) / Math.log(2);
 
     ret = mod(octave, 1) * 360;
 
