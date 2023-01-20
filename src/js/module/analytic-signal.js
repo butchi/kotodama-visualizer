@@ -5,8 +5,8 @@ import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, g
 
 const param = {
   kernelLen: 127,
-  amp: 128,
-  freqSync: 'none',
+  amp: 512,
+  freqSync: 'stroke',
   fillColor: '#000000',
   fillAlpha: 0,
   strokeColor: '#000000',
@@ -15,7 +15,7 @@ const param = {
   line: true,
   pointSize: 1,
   point: false,
-  normalize: true,
+  normalize: false,
   output: 'video',
 };
 
