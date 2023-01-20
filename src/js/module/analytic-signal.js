@@ -14,6 +14,7 @@ const param = {
   line: true,
   pointSize: 1,
   point: true,
+  normalize: true,
 };
 
 export default class AnalyticSignal {
@@ -85,6 +86,10 @@ export default class AnalyticSignal {
     const volAvg = _.meanBy(ptArr, 'volume');
     const opacity = Math.min(Math.pow(volAvg, 2) * 10, 1);
 
+    ptArr.forEach(pt => {
+      pt.x = width / 2 + pt.re / (param.normalize ? volAvg : 1) * amp;
+      pt.y = height / 2 - pt.im / (param.normalize ? volAvg : 1) * amp;
+    });
 
     const prev = { x: null, y: null };
 
