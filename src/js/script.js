@@ -23,7 +23,75 @@ async function initializeWithUserMedia(constraints) {
   let stream = null;
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (constraints.video) {
+      stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+    } else {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+    }
+
+    let base64 = ''
+    let chunks = []
+
+    const mediaRecorder = new MediaRecorder(stream)
+    mediaRecorder.onstop = _evt => {
+      const blob = new Blob(chunks, { type: 'audio/wav' })
+      const reader = new window.FileReader()
+      reader.readAsDataURL(blob)
+      reader.onloadend = () => { base64 = reader.result }
+      chunks = []
+    }
+    mediaRecorder.ondataavailable = evt => { chunks.push(evt.data) }
+
+    globalThis.SpeechRecognition = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
+
+    const speechRecognition = new globalThis.SpeechRecognition()
+    speechRecognition.continuous = false
+    speechRecognition.interimResults = false
+    speechRecognition.lang = 'ja-JP'
+
+    speechRecognition.onresult = evt => {
+      // speechRecognition.stop()
+
+      for (let i = evt.resultIndex; i < evt.results.length; i++) {
+        if (!evt.results[i].isFinal) continue
+
+        const { transcript } = evt.results[i][0]
+        console.log(`Recognized: ${transcript}`)
+        // console.log(`Base64: ${base64}`)
+      }
+    }
+
+    speechRecognition.onspeechstart = _ => {
+      console.log('onspeechstart')
+      mediaRecorder.start();
+    }
+    speechRecognition.onstart = _ => {
+      console.log('onstart');
+    }
+    speechRecognition.onaudioend = _ => {
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }
+    speechRecognition.onend = _ => {
+      console.log('onend');
+      speechRecognition.start();
+    }
+    speechRecognition.onspeechend = _ => {
+      console.log('onspeechend');
+    }
+    speechRecognition.onnomatch = _ => {
+      console.log('onnomatch');
+    }
+    speechRecognition.onsoundend = _ => {
+      console.log('onsoundend');
+    }
+
+    document.querySelector('[data-js-stage]').addEventListener('click', evt => {
+      speechRecognition.stop();
+    });
+
+    speechRecognition.start()
 
     const audioElm = document.querySelector('[data-js-output]');
 
