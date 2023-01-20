@@ -2,6 +2,7 @@ import $, { map } from 'jquery';
 import * as dat from 'dat.gui';
 import ns from './ns';
 import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
+import chroma from 'chroma-js';
 
 const param = {
   kernelLen: 127,
@@ -35,9 +36,9 @@ export default class AnalyticSignal {
 
     gui.add(param, 'amp', 0, 16383);
     gui.add(param, 'freqSync', ['none', 'fill', 'stroke', 'point']);
-    gui.addColor(param, 'fillColor', 'color');
+    gui.addColor(param, 'fillColor');
     gui.add(param, 'fillAlpha', 0, 1, 0.01);
-    gui.addColor(param, 'strokeColor', 'color');
+    gui.addColor(param, 'strokeColor');
     gui.add(param, 'strokeAlpha', 0, 1, 0.01);
     gui.add(param, 'lineWidth', 0, 5, 1);
     gui.add(param, 'line');
@@ -152,7 +153,7 @@ export default class AnalyticSignal {
       if (prev.x != null && prev.y != null) {
         if (param.line) {
           context.beginPath();
-          context.fillStyle = param.freqSync === 'fill' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
+          context.fillStyle = (param.freqSync === 'fill' && !param.point) ? rgba : chroma(param.fillColor).alpha(param.fillAlpha);
           context.moveTo(width / 2, height / 2);
           context.lineTo(prev.x, prev.y);
           context.lineTo(pt.x, pt.y);
@@ -160,7 +161,7 @@ export default class AnalyticSignal {
           context.fill();
 
           context.beginPath();
-          context.strokeStyle = param.freqSync === 'stroke' ? rgba : getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
+          context.strokeStyle = param.freqSync === 'stroke' ? rgba : chroma(param.strokeColor).alpha(param.strokeAlpha);
           context.lineWidth = param.lineWidth;
           context.lineTo(prev.x, prev.y);
           context.lineTo(pt.x, pt.y);
@@ -168,7 +169,8 @@ export default class AnalyticSignal {
 
         if (param.point) {
           context.beginPath();
-          context.fillStyle = param.freqSync === 'point' ? rgba : getHsvColor(param.fillColor).alpha(param.fillAlpha);
+          context.strokeStyle = getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
+          context.fillStyle = param.freqSync === 'point' ? rgba : chroma(param.fillColor).alpha(param.fillAlpha);
           context.arc(pt.x, pt.y, param.pointSize, 0, Math.PI * 2);
           context.fill();
         }
