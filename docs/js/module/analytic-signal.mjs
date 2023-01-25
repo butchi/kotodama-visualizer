@@ -97,7 +97,7 @@ export default class AnalyticSignal {
       ptArr.push({ re, im, hue, volume, amp });
     }
 
-    const volAvg = _.meanBy(ptArr, 'volume');
+    const volAvg = ptArr.reduce((p, c) => p + c.volume, 0) / ptArr.length;
 
     ptArr.forEach(pt => {
       pt.x = width / 2 + pt.re / (param.normalize ? volAvg : 1) * amp;

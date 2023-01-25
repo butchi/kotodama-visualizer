@@ -10,8 +10,8 @@ export const normalize = (val) => {
   return (val - 128) / 128;
 };
 
-export const maxIndexOf = (arr) => {
-  return _.indexOf(arr, _.max(arr));
+export const maxIndexOf = arr => {
+  return arr.indexOf(Math.max(...arr));
 };
 
 // from http://shnya.jp/blog/?p=323
