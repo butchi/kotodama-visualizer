@@ -1,38 +1,81 @@
-extends /layout/_default-layout
+doctype html
+html(lang="ja")
+  head
+    meta(charset="utf-8")
 
-append config-block
-  - pageId = 'index'
+    title 
+      | コトダマ可視化デモ
+    meta(name="description", content="コトダマを可視化するデモです。")
+    meta(name="keywords", content="kotodama, analytic signal, audio visualization")
+    link(rel="shortcut icon", href="https://butchi.github.io/kotodama-visualizer/favicon.ico", type="image/vnd.microsoft.icon")
+    link(rel="icon", href="https://butchi.github.io/kotodama-visualizer/favicon.ico", type="image/vnd.microsoft.icon")
+    link(rel="apple-touch-icon", href="https://butchi.github.io/kotodama-visualizer/web-clip-icon.png")
 
-block content-block
-  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
-    .mdl-layout__header
-      .mdl-layout__header-row
-        span.mdl-layout-title コトダマ可視化デモ
-    .mdl-layout__drawer
-      nav.mdl-navigation
-        a.mdl-navigation__link(href='./')
-          i.material-icons
-            | mic
-          | マイク入力
-        a.mdl-navigation__link(href='./?display=true')
-          i.material-icons
-            | speaker
-          | ページ外音声
-        a.mdl-navigation__link(href='./?audio=vivaldi-spring')
-          | ヴィヴァルディ 四季より『春』
-        a.mdl-navigation__link(href='./?audio=chopin-nocturnes')
-          | ショパン『夜想曲第二番』
-        a.mdl-navigation__link(href='./?audio=satie-je-te-veux')
-          | サティ『Je te veux』
+    meta(property="og:url", content="https://butchi.github.io/kotodama-visualizer/")
+    meta(property="og:image", content="https://butchi.github.io/kotodama-visualizer/ogp.png")
+    meta(property="og:type", content="website")
+    meta(property="og:title", content="コトダマ可視化デモ")
+    meta(property="og:site_name", content="コトダマ可視化デモ")
+    meta(property="og:description", content="コトダマを可視化するデモです。")
+    meta(property="og:locale", content="ja_JP")
 
-    main.mdl-layout__content
-      .page-content
-        //- .console
-        //- .point-wrapper
-        //-   .point
-        audio(data-js-output, autoplay)
-        canvas.stage(data-js-canvas, width="256", height="256")
-        video(data-js-stage, width="256", height="256", autoplay, controls)
-      .cover(data-js-btn-play)
-        .icon-play.material-icons
-          | play_arrow
+    // twitter card
+    meta(property="twitter:card", content='summary_large_image')
+    meta(property="twitter:title", content="コトダマ可視化デモ")
+    meta(property="twitter:description", content="コトダマを可視化するデモです。")
+
+    meta(property="twitter:image", content="https://butchi.github.io/kotodama-visualizer/ogp.png")
+
+    link(rel="canonical" href="https://butchi.github.io/kotodama-visualizer/")
+
+    link(rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css")
+
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no")
+
+  body
+    #fb-root
+    script(async, defer, src="https://connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v3.2&appId=903742642995033&autoLogAppEvents=1")
+    .wrapper
+      .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+        .mdl-layout__header
+          .mdl-layout__header-row
+            span.mdl-layout-title コトダマ可視化デモ
+        .mdl-layout__drawer
+          nav.mdl-navigation
+            a.mdl-navigation__link(href='./')
+              i.material-icons
+                | mic
+              | マイク入力
+            a.mdl-navigation__link(href='./?display=true')
+              i.material-icons
+                | speaker
+              | ページ外音声
+            a.mdl-navigation__link(href='./?audio=vivaldi-spring')
+              | ヴィヴァルディ 四季より『春』
+            a.mdl-navigation__link(href='./?audio=chopin-nocturnes')
+              | ショパン『夜想曲第二番』
+            a.mdl-navigation__link(href='./?audio=satie-je-te-veux')
+              | サティ『Je te veux』
+
+        main.mdl-layout__content
+          .page-content
+            audio(data-js-output, autoplay)
+            canvas.stage(data-js-canvas, width="256", height="256")
+            video(data-js-stage, width="256", height="256", autoplay, controls)
+          .cover(data-js-btn-play)
+            .icon-play.material-icons
+              | play_arrow
+
+    // javascript
+    block javascript-block
+      script(defer src="https://code.getmdl.io/1.3.0/material.min.js")
+
+    script.
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-2779957-9', 'auto');
+      ga('send', 'pageview');
