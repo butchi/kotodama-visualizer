@@ -1,13 +1,9 @@
-export const inv = (n) => {
+export const inv = n => {
   if (n === 0) {
     return 0;
   } else {
     return 1 / (n * Math.PI);
   }
-};
-
-export const normalize = (val) => {
-  return (val - 128) / 128;
 };
 
 export const maxIndexOf = arr => {

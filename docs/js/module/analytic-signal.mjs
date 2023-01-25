@@ -3,15 +3,18 @@ import { inv, maxIndexOf, mod, norm, getHsvColor } from './util.mjs';
 const param = {
   kernelLen: 127,
   amp: 512,
-  freqSync: 'stroke',
-  fillColor: '#000000',
-  fillAlpha: 0,
-  strokeColor: '#000000',
-  strokeAlpha: 1,
+  freqSync: 'surface',
+  surface: true,
+  surfaceColor: '#ffffff',
+  surfaceAlpha: 0.5,
+  lineColor: '#000000',
+  lineAlpha: 0.5,
   lineWidth: 1,
   line: true,
   pointSize: 1,
   point: false,
+  pointColor: '#000000',
+  pointAlpha: 0.5,
   normalize: false,
   output: 'canvas',
 };
@@ -31,14 +34,38 @@ export default class AnalyticSignal {
     gui.domElement.style.right = 0;
 
     gui.add(param, 'amp', 0, 16383);
-    gui.add(param, 'freqSync', ['none', 'fill', 'stroke', 'point']);
-    gui.addColor(param, 'fillColor');
-    gui.add(param, 'fillAlpha', 0, 1, 0.01);
-    gui.addColor(param, 'strokeColor');
-    gui.add(param, 'strokeAlpha', 0, 1, 0.01);
-    gui.add(param, 'lineWidth', 0, 5, 1);
+    gui.add(param, 'freqSync', ['none', 'surface', 'line', 'point']).onChange(val => {
+      if (val === '') {
+      } else if (val === 'surface') {
+        param.surface = true;
+        param.line = false;
+        param.point = false;
+        param.surfaceAlpha = 1;
+        gui.updateDisplay();
+      } else if (val === 'line') {
+        param.surface = false;
+        param.line = true;
+        param.point = false;
+        param.lineAlpha = 1;
+        gui.updateDisplay();
+      } else if (val === 'point') {
+        param.surface = false;
+        param.line = false;
+        param.point = true;
+        param.pointAlpha = 1;
+        gui.updateDisplay();
+      }
+    });
+    gui.add(param, 'surface');
+    gui.addColor(param, 'surfaceColor');
+    gui.add(param, 'surfaceAlpha', 0, 1, 0.01);
     gui.add(param, 'line');
+    gui.addColor(param, 'lineColor');
+    gui.add(param, 'lineAlpha', 0, 1, 0.01);
+    gui.add(param, 'lineWidth', 0, 15, 1);
     gui.add(param, 'point');
+    gui.addColor(param, 'pointColor');
+    gui.add(param, 'pointAlpha', 0, 1, 0.01);
     gui.add(param, 'pointSize', 0, 9, 0.01);
     gui.add(param, 'normalize');
     gui.add(param, 'output', ['canvas', 'video']).onChange(val => {
@@ -53,10 +80,11 @@ export default class AnalyticSignal {
     });
 
     const stageElm = this.stageElm = opts.stageElm;
-    const fftSize = this.fftSize = opts.fftSize;
-    const sampleRate = this.sampleRate = opts.sampleRate;
 
-    const context = this.context = stageElm.getContext('2d');
+    this.fftSize = opts.fftSize;
+    this.sampleRate = opts.sampleRate;
+
+    this.context = stageElm.getContext('2d');
 
     this.consoleElm = document.querySelector('.console');
     this.voicedFlag = false;
@@ -78,7 +106,7 @@ export default class AnalyticSignal {
 
     const hue = this.hue(frequencyData);
 
-    const rgba = getHsvColor(hue || 0, 0.8, 0.5).alpha(0.3).css();
+    const rgba = getHsvColor(hue || 0, 0.8, 0.5);
 
     const ptArr = [];
 
@@ -100,8 +128,8 @@ export default class AnalyticSignal {
     const volAvg = ptArr.reduce((p, c) => p + c.volume, 0) / ptArr.length;
 
     ptArr.forEach(pt => {
-      pt.x = width / 2 + pt.re / (param.normalize ? volAvg : 1) * amp;
-      pt.y = height / 2 - pt.im / (param.normalize ? volAvg : 1) * amp;
+      pt.x = width / 2 + pt.re / (param.normalize ? volAvg * 8 : 1) * amp;
+      pt.y = height / 2 - pt.im / (param.normalize ? volAvg * 8 : 1) * amp;
     });
 
     const prev = { x: null, y: null };
@@ -147,32 +175,36 @@ export default class AnalyticSignal {
 
     ptArr.forEach(pt => {
       if (prev.x != null && prev.y != null) {
-        if (param.line) {
+        if (param.surface) {
+          context.strokeStyle = "transparent";
+          context.fillStyle = (param.freqSync === 'surface') ? rgba.alpha(param.surfaceAlpha).css() : chroma(param.surfaceColor).alpha(param.surfaceAlpha);
           context.beginPath();
-          context.fillStyle = (param.freqSync === 'fill' && !param.point) ? rgba : chroma(param.fillColor).alpha(param.fillAlpha);
           context.moveTo(width / 2, height / 2);
           context.lineTo(prev.x, prev.y);
           context.lineTo(pt.x, pt.y);
           context.lineTo(width / 2, height / 2);
           context.fill();
+        }
 
+        if (param.line) {
+          context.strokeStyle = param.freqSync === 'line' ? rgba.alpha(param.lineAlpha).css() : chroma(param.lineColor).alpha(param.lineAlpha);
+          context.fillStyle = "transparent";
           context.beginPath();
-          context.strokeStyle = param.freqSync === 'stroke' ? rgba : chroma(param.strokeColor).alpha(param.strokeAlpha);
           context.lineWidth = param.lineWidth;
           context.lineTo(prev.x, prev.y);
           context.lineTo(pt.x, pt.y);
+          context.stroke();
+          context.fill();
         }
 
         if (param.point) {
+          context.strokeStyle = "transparent";
+          context.fillStyle = param.freqSync === 'point' ? rgba.alpha(param.pointAlpha).css() : chroma(param.pointColor).alpha(param.pointAlpha);
           context.beginPath();
-          context.strokeStyle = getHsvColor(param.strokeColor).alpha(param.strokeAlpha);
-          context.fillStyle = param.freqSync === 'point' ? rgba : chroma(param.fillColor).alpha(param.fillAlpha);
           context.arc(pt.x, pt.y, param.pointSize, 0, Math.PI * 2);
           context.fill();
         }
       }
-
-      context.stroke();
 
       prev.x = pt.x;
       prev.y = pt.y;
