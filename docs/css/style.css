@@ -1,39 +1,54 @@
 html {
-  font-size: 100px; }
+  font-size: 100px;
+}
 
 body {
   font-size: 0.15rem;
   font-family: YuGothic, sans-serif;
-  line-height: 1.5; }
+  line-height: 1.5;
+}
 
 main {
-  display: block; }
+  display: block;
+}
 
 * {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 a {
   color: inherit;
-  text-decoration: inherit; }
+  text-decoration: inherit;
+}
 
 .wrapper {
   width: 100%;
   min-width: 12rem;
   overflow: hidden;
-  overflow: hidden; }
+  overflow: hidden;
+}
 
 .page-content {
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+}
 
 .stage {
   position: fixed;
   left: 0;
   top: 0;
-  visibility: hidden; }
+  visibility: hidden;
+}
+
+.video {
+  position: fixed;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+}
 
 .cover {
   position: absolute;
@@ -43,7 +58,8 @@ a {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 5;
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 .cover .icon-play {
   position: absolute;
@@ -54,10 +70,12 @@ a {
   margin-left: -50px;
   margin-top: -50px;
   font-size: 100px;
-  color: red; }
+  color: red;
+}
 
 .console {
   position: fixed;
   left: 0;
   top: 0.65rem;
-  font-size: 0.15rem; }
+  font-size: 0.15rem;
+}

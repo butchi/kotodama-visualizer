@@ -3,7 +3,7 @@ import AnalyticSignal from './module/analytic-signal.mjs';
 globalThis.AudioContext = globalThis.AudioContext || globalThis.webkitAudioContext || globalThis.mozAudioContext || globalThis.msAudioContext;
 
 const stageElm = document.querySelector('[data-js-canvas]');
-const videoElm = document.querySelector('[data-js-stage]');
+const videoElm = document.querySelector('[data-js-video]');
 const btnPlayElm = document.querySelector('[data-js-btn-play]');
 
 let timeDomainData;
@@ -15,6 +15,7 @@ $(globalThis).on('resize', _ => {
     stageElm.height = $(globalThis).height();
     videoElm.width = $(globalThis).width();
     videoElm.height = $(globalThis).height();
+    stageElm.style.visibility = 'visible';
 }).trigger('resize');
 
 async function initializeWithUserMedia(constraints) {
