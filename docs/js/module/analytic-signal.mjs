@@ -26,7 +26,7 @@ export default class AnalyticSignal {
   }
 
   initialize(opts = {}) {
-    globalThis.frameCnt = 0;
+    this.frameCnt = 0;
 
     const gui = new dat.GUI();
 
@@ -72,40 +72,41 @@ export default class AnalyticSignal {
     gui.add(param, 'output', ['canvas', 'video']).onChange(val => {
       if (val === '') {
       } else if (val === 'canvas') {
-        videoElm.style.visibility = 'hidden'
-        stageElm.style.visibility = 'visible'
+        this.videoElm.style.visibility = 'hidden'
+        this.stageElm.style.visibility = 'visible'
       } else if (val === 'video') {
-        stageElm.style.visibility = 'hidden'
-        videoElm.style.visibility = 'visible'
+        this.stageElm.style.visibility = 'hidden'
+        this.videoElm.style.visibility = 'visible'
       }
     });
     gui.add(param, 'pip').onChange(isPip => {
       if (isPip) {
-        videoElm.requestPictureInPicture();
+        this.videoElm.requestPictureInPicture();
       } else if (document.pictureInPictureElement) {
         document.exitPictureInPicture();
       }
     })
 
-    const stageElm = this.stageElm = opts.stageElm;
+    this.stageElm = opts.stageElm;
 
     this.fftSize = opts.fftSize;
     this.sampleRate = opts.sampleRate;
 
-    this.context = stageElm.getContext('2d');
+    this.context = this.stageElm.getContext('2d');
 
     this.consoleElm = document.querySelector('.console');
     this.voicedFlag = false;
 
     this.pointElm = document.querySelector('.point');
 
-    const videoElm = document.querySelector('video');
-    var str = this.stageElm.captureStream(30);
-    videoElm.srcObject = str;
+    this.videoElm = document.querySelector('video');
+    var stream = this.stageElm.captureStream(30);
+    this.videoElm.srcObject = stream;
+    this.videoElm.play();
   }
 
   draw({ frequencyData, timeDomainData }) {
-    globalThis.frameCnt++;
+    this.frameCnt++;
 
     const width = $(window).width();
     const height = $(window).height();
