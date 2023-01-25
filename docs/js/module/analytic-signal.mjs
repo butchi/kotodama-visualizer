@@ -17,6 +17,7 @@ const param = {
   pointAlpha: 0.5,
   normalize: false,
   output: 'canvas',
+  pip: false,
 };
 
 export default class AnalyticSignal {
@@ -78,6 +79,13 @@ export default class AnalyticSignal {
         videoElm.style.visibility = 'visible'
       }
     });
+    gui.add(param, 'pip').onChange(isPip => {
+      if (isPip) {
+        videoElm.requestPictureInPicture();
+      } else if (document.pictureInPictureElement) {
+        document.exitPictureInPicture();
+      }
+    })
 
     const stageElm = this.stageElm = opts.stageElm;
 
