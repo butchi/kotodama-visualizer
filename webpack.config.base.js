@@ -11,22 +11,12 @@ const DEST = './docs'
 const HOST = process.env.HOST || '0.0.0.0'
 const PORT = process.env.PORT || 3000
 
-const constants = readConfig(`${SRC}/constants.yml`)
-const { REPO_NAME, BASE_DIR } = constants
-
 const production = process.env.NODE_ENV === 'production'
 
 // page/**/*.pug -> dist/**/*.html
 const htmlTemplates = routeDataMapper({
     baseDir: `${SRC}/pug/page`,
     src: '**/[!_]*.pug',
-    locals: Object.assign(
-        {},
-        constants,
-        {
-            meta: readConfig(`${SRC}/pug/meta.yml`)
-        }
-    )
 })
 
 module.exports = {
@@ -37,7 +27,7 @@ module.exports = {
     },
     // 出力するディレクトリ・ファイル名などの設定
     output: {
-        path: path.resolve(__dirname, DEST + BASE_DIR),
+        path: path.resolve(__dirname, DEST + "/"),
         filename: '[name]',
         publicPath: '',
     },
@@ -87,7 +77,7 @@ module.exports = {
                         {
                             loader: 'sass-loader',
                             options: {
-                                includePaths: [ `${SRC}/scss` ],
+                                includePaths: [`${SRC}/scss`],
                             },
                         }
                     ]
@@ -104,7 +94,7 @@ module.exports = {
         host: HOST,
         port: PORT,
         contentBase: DEST,
-        openPage: path.relative('/', BASE_DIR),
+        openPage: "/",
     },
     // キャシュ有効化
     cache: true,
