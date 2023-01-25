@@ -2,7 +2,7 @@ import { indexOf, max } from 'lodash';
 import chroma from 'chroma-js';
 
 export const inv = (n) => {
-  if(n === 0) {
+  if (n === 0) {
     return 0;
   } else {
     return 1 / (n * Math.PI);
