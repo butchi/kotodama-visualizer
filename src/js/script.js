@@ -30,7 +30,7 @@ async function initializeWithUserMedia(constraints) {
     } else {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
     }
-    
+
     const audioElm = document.querySelector('[data-js-output]');
 
     audioElm.srcObject = stream;
