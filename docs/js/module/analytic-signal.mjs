@@ -1,7 +1,4 @@
-import $, { map } from 'jquery';
-import * as dat from 'dat.gui';
-import { inv, normalize, maxIndexOf, mod, norm, getHsvColor, generatePolygons, generateCircles, generateLines, generatePolylinePoints } from '../module/util';
-import chroma from 'chroma-js';
+import { inv, maxIndexOf, mod, norm, getHsvColor } from './util.mjs';
 
 const param = {
   kernelLen: 127,

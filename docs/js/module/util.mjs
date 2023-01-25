@@ -1,6 +1,3 @@
-import { indexOf, max } from 'lodash';
-import chroma from 'chroma-js';
-
 export const inv = (n) => {
   if (n === 0) {
     return 0;
@@ -14,7 +11,7 @@ export const normalize = (val) => {
 };
 
 export const maxIndexOf = (arr) => {
-  return indexOf(arr, max(arr));
+  return _.indexOf(arr, _.max(arr));
 };
 
 // from http://shnya.jp/blog/?p=323
