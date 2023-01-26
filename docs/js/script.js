@@ -146,12 +146,13 @@ $(btnPlayElm).one('click', _ => {
     let audioName;
     $(btnPlayElm).hide();
 
-    const locSrch = location.search.substring(1);
-    if (locSrch.match(/audio/)) {
-        audioName = queryString.audio;
+    const queryString = location.search;
+    const paramLi = new URLSearchParams(queryString);
+    if (paramLi.get("audio")) {
+        audioName = paramLi.get("audio");
 
         initializeWithAudio({ audioName });
-    } else if (locSrch.match(/display/)) {
+    } else if (paramLi.get("display")) {
         initializeWithUserMedia({ video: true, audio: true });
     } else {
         initializeWithUserMedia({ audio: true });
