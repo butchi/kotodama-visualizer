@@ -182,9 +182,9 @@ export default class AnalyticSignal {
     //   this.voicedFlag = false;
     // }
 
-    ptArr.forEach(pt => {
-      if (prev.x != null && prev.y != null) {
-        if (param.surface) {
+    if (param.surface) {
+      ptArr.forEach(pt => {
+        if (prev.x != null && prev.y != null) {
           context.strokeStyle = "transparent";
           context.fillStyle = (param.freqSync === 'surface') ? rgba.alpha(param.surfaceAlpha).css() : chroma(param.surfaceColor).alpha(param.surfaceAlpha);
           context.beginPath();
@@ -193,31 +193,47 @@ export default class AnalyticSignal {
           context.lineTo(pt.x, pt.y);
           context.lineTo(width / 2, height / 2);
           context.fill();
-        }
-
-        if (param.line) {
-          context.strokeStyle = param.freqSync === 'line' ? rgba.alpha(param.lineAlpha).css() : chroma(param.lineColor).alpha(param.lineAlpha);
-          context.fillStyle = "transparent";
-          context.beginPath();
-          context.lineWidth = param.lineWidth;
-          context.lineTo(prev.x, prev.y);
-          context.lineTo(pt.x, pt.y);
           context.stroke();
-          context.fill();
         }
 
-        if (param.point) {
+        prev.x = pt.x;
+        prev.y = pt.y;
+      });
+    }
+    if (param.line) {
+      context.strokeStyle = param.freqSync === 'line' ? rgba.alpha(param.lineAlpha).css() : chroma(param.lineColor).alpha(param.lineAlpha);
+      context.fillStyle = "transparent";
+      context.lineWidth = param.lineWidth;
+      context.beginPath();
+
+      ptArr.forEach(pt => {
+        if (prev.x != null && prev.y != null) {
+          context.lineTo(pt.x, pt.y);
+        } else {
+          context.moveTo(pt.x, pt.y);
+        }
+
+        prev.x = pt.x;
+        prev.y = pt.y;
+      });
+
+      context.fill();
+      context.stroke();
+    }
+    if (param.point) {
+      ptArr.forEach(pt => {
+        if (prev.x != null && prev.y != null) {
           context.strokeStyle = "transparent";
           context.fillStyle = param.freqSync === 'point' ? rgba.alpha(param.pointAlpha).css() : chroma(param.pointColor).alpha(param.pointAlpha);
           context.beginPath();
           context.arc(pt.x, pt.y, param.pointSize, 0, Math.PI * 2);
           context.fill();
         }
-      }
 
-      prev.x = pt.x;
-      prev.y = pt.y;
-    });
+        prev.x = pt.x;
+        prev.y = pt.y;
+      });
+    }
   }
 
   hue(frequencyData) {
