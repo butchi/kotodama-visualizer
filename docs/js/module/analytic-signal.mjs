@@ -2,7 +2,7 @@ import 'https://code.jquery.com/jquery-3.6.3.min.js';
 import 'https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js';
 import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.17/+esm';
 import { inv, maxIndexOf, mod, norm, getHsvColor } from './util.mjs';
-import colorTheme from '../data/color-theme.json';
+import colorTheme from '../data/color-theme.json' assert { type: "json" };
 
 const paramDefault = {
   kernelLen: 127,
