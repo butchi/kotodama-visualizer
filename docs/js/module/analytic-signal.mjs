@@ -45,6 +45,112 @@ export default class AnalyticSignal {
 
     const guiController = [
       gui.add(param, 'amp', 0, 16383),
+      gui.add(param, 'theme', ['default', 'kotodama', 'mono', 'nega', 'oscillo', 'bios', 'medetai', 'psychedelic', 'reiwa']).onChange(val => {
+        let { freqSync, bgColor, surface, surfaceColor, surfaceAlpha, line, lineColor, lineAlpha, lineWidth, point, pointSize, pointColor, pointAlpha } = paramDefault;
+
+        if (val === '') {
+        } else if (val === 'kotodama') {
+          bgColor = '#ffffff';
+          freqSync = false;
+          surface = true;
+          line = false;
+          point = false;
+          surfaceAlpha = 0.5;
+          surfaceColor = '#7b68ee';
+          lineAlpha = 0.3;
+          lineColor = '#ffffff';
+        } else if (val === 'oscillo') {
+          bgColor = '#000000';
+          freqSync = false;
+          surface = false;
+          line = true;
+          point = false;
+          lineAlpha = 1;
+          lineColor = '#00ff00';
+        } else if (val === 'mono') {
+          bgColor = '#ffffff';
+          freqSync = false;
+          surface = false;
+          line = true;
+          point = false;
+          lineAlpha = 1;
+          lineColor = '#000000';
+        } else if (val === 'nega') {
+          bgColor = '#000000';
+          freqSync = false;
+          surface = false;
+          line = true;
+          point = false;
+          lineAlpha = 1;
+          lineColor = '#ffffff';
+        } else if (val === 'bios') {
+          bgColor = '#0000ff';
+          freqSync = false;
+          surface = false;
+          line = true;
+          point = false;
+          lineAlpha = 1;
+          lineColor = '#ffff00';
+        } else if (val === 'medetai') {
+          bgColor = '#c18e33';
+          freqSync = false;
+          surface = true;
+          line = true;
+          point = true;
+          surfaceAlpha = 0.5;
+          surfaceColor = '#e83530';
+          lineAlpha = 1;
+          lineColor = '#ffffff';
+          pointSize = 1.5;
+          pointAlpha = 1;
+          pointColor = '#ffffff';
+        } else if (val === 'psychedelic') {
+          bgColor = '#ffa500';
+          freqSync = false;
+          surface = true;
+          line = true;
+          point = true;
+          surfaceAlpha = 0.5;
+          surfaceColor = '#00ffff';
+          lineAlpha = 1;
+          lineColor = '#ff00ff';
+          pointSize = 1.5;
+          pointAlpha = 1;
+          pointColor = '#800000';
+        } else if (val === 'reiwa') {
+          bgColor = '#ffffff';
+          freqSync = false;
+          surface = true;
+          line = true;
+          point = true;
+          surfaceAlpha = 0.5;
+          surfaceColor = '#f7dade';
+          lineAlpha = 1;
+          lineColor = '#e3a9b8';
+          pointSize = 1.5;
+          pointAlpha = 1;
+          pointColor = '#524362';
+        } else {
+        }
+
+        Object.assign(param, {
+          freqSync,
+          bgColor,
+          surface,
+          surfaceColor,
+          surfaceAlpha,
+          lineColor,
+          lineAlpha,
+          lineWidth,
+          line,
+          pointSize,
+          point,
+          pointColor,
+          pointAlpha,
+        });
+
+        guiController.forEach(c => c.updateDisplay());
+      }),
       gui.add(param, 'freqSync', ['none', 'surface', 'line', 'point']).onChange(val => {
         if (val === '') {
         } else if (val === 'surface') {
