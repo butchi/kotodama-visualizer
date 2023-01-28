@@ -7,6 +7,7 @@ const param = {
   kernelLen: 127,
   amp: 512,
   freqSync: 'surface',
+  bgColor: '#ffffff',
   surface: true,
   surfaceColor: '#ffffff',
   surfaceAlpha: 0.5,
@@ -60,6 +61,7 @@ export default class AnalyticSignal {
         gui.updateDisplay();
       }
     });
+    gui.addColor(param, 'bgColor');
     gui.add(param, 'surface');
     gui.addColor(param, 'surfaceColor');
     gui.add(param, 'surfaceAlpha', 0, 1, 0.01);
@@ -146,7 +148,7 @@ export default class AnalyticSignal {
 
     const prev = { x: null, y: null };
 
-    context.fillStyle = '#fff';
+    context.fillStyle = param.bgColor;
     context.fillRect(0, 0, width, height);
 
     // const lenNum = ptArr.reduce((p, c, i, arr) => {
