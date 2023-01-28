@@ -3,26 +3,29 @@ import 'https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js';
 import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.17/+esm';
 import { inv, maxIndexOf, mod, norm, getHsvColor } from './util.mjs';
 
-const param = {
+const paramDefault = {
   kernelLen: 127,
   amp: 512,
+  theme: 'default',
   freqSync: 'surface',
   bgColor: '#ffffff',
   surface: true,
   surfaceColor: '#ffffff',
   surfaceAlpha: 0.5,
+  line: true,
   lineColor: '#000000',
   lineAlpha: 0.5,
   lineWidth: 1,
-  line: true,
-  pointSize: 1,
   point: false,
+  pointSize: 1,
   pointColor: '#000000',
   pointAlpha: 0.5,
   normalize: false,
   output: 'canvas',
   pip: false,
 };
+
+const param = Object.assign({}, paramDefault);
 
 export default class AnalyticSignal {
   constructor(opts = {}) {
@@ -40,59 +43,60 @@ export default class AnalyticSignal {
     gui.domElement.style.position = 'absolute';
     gui.domElement.style.right = 0;
 
-    gui.add(param, 'amp', 0, 16383);
-    gui.add(param, 'freqSync', ['none', 'surface', 'line', 'point']).onChange(val => {
-      if (val === '') {
-      } else if (val === 'surface') {
-        param.surface = true;
-        param.line = false;
-        param.point = false;
-        param.surfaceAlpha = 1;
-        gui.updateDisplay();
-      } else if (val === 'line') {
-        param.surface = false;
-        param.line = true;
-        param.point = false;
-        param.lineAlpha = 1;
-        gui.updateDisplay();
-      } else if (val === 'point') {
-        param.surface = false;
-        param.line = false;
-        param.point = true;
-        param.pointAlpha = 1;
-        gui.updateDisplay();
-      }
-    });
-    gui.addColor(param, 'bgColor');
-    gui.add(param, 'surface');
-    gui.addColor(param, 'surfaceColor');
-    gui.add(param, 'surfaceAlpha', 0, 1, 0.01);
-    gui.add(param, 'line');
-    gui.addColor(param, 'lineColor');
-    gui.add(param, 'lineAlpha', 0, 1, 0.01);
-    gui.add(param, 'lineWidth', 0, 15, 1);
-    gui.add(param, 'point');
-    gui.addColor(param, 'pointColor');
-    gui.add(param, 'pointAlpha', 0, 1, 0.01);
-    gui.add(param, 'pointSize', 0, 9, 0.01);
-    gui.add(param, 'normalize');
-    gui.add(param, 'output', ['canvas', 'video']).onChange(val => {
-      if (val === '') {
-      } else if (val === 'canvas') {
-        this.videoElm.style.visibility = 'hidden'
-        this.stageElm.style.visibility = 'visible'
-      } else if (val === 'video') {
-        this.stageElm.style.visibility = 'hidden'
-        this.videoElm.style.visibility = 'visible'
-      }
-    });
-    gui.add(param, 'pip').onChange(isPip => {
-      if (isPip) {
-        this.videoElm.requestPictureInPicture();
-      } else if (document.pictureInPictureElement) {
-        document.exitPictureInPicture();
-      }
-    })
+    const guiController = [
+      gui.add(param, 'amp', 0, 16383),
+      gui.add(param, 'freqSync', ['none', 'surface', 'line', 'point']).onChange(val => {
+        if (val === '') {
+        } else if (val === 'surface') {
+          param.surface = true;
+          param.line = false;
+          param.point = false;
+          param.surfaceAlpha = 1;
+        } else if (val === 'line') {
+          param.surface = false;
+          param.line = true;
+          param.point = false;
+          param.lineAlpha = 1;
+        } else if (val === 'point') {
+          param.surface = false;
+          param.line = false;
+          param.point = true;
+          param.pointAlpha = 1;
+        }
+
+        guiController.forEach(c => c.updateDisplay());
+      }),
+      gui.addColor(param, 'bgColor'),
+      gui.add(param, 'surface'),
+      gui.addColor(param, 'surfaceColor'),
+      gui.add(param, 'surfaceAlpha', 0, 1, 0.01),
+      gui.add(param, 'line'),
+      gui.addColor(param, 'lineColor'),
+      gui.add(param, 'lineAlpha', 0, 1, 0.01),
+      gui.add(param, 'lineWidth', 0, 15, 1),
+      gui.add(param, 'point'),
+      gui.addColor(param, 'pointColor'),
+      gui.add(param, 'pointAlpha', 0, 1, 0.01),
+      gui.add(param, 'pointSize', 0, 9, 0.01),
+      gui.add(param, 'normalize'),
+      gui.add(param, 'output', ['canvas', 'video']).onChange(val => {
+        if (val === '') {
+        } else if (val === 'canvas') {
+          this.videoElm.style.visibility = 'hidden'
+          this.stageElm.style.visibility = 'visible'
+        } else if (val === 'video') {
+          this.stageElm.style.visibility = 'hidden'
+          this.videoElm.style.visibility = 'visible'
+        }
+      }),
+      gui.add(param, 'pip').onChange(isPip => {
+        if (isPip) {
+          this.videoElm.requestPictureInPicture();
+        } else if (document.pictureInPictureElement) {
+          document.exitPictureInPicture();
+        }
+      })
+    ];
 
     this.stageElm = opts.stageElm;
 
