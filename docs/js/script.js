@@ -1,3 +1,4 @@
+import 'https://code.jquery.com/jquery-3.6.3.min.js';
 import AnalyticSignal from './module/analytic-signal.mjs';
 
 globalThis.AudioContext = globalThis.AudioContext || globalThis.webkitAudioContext || globalThis.mozAudioContext || globalThis.msAudioContext;
