@@ -34,6 +34,8 @@ export default class AnalyticSignal {
 
     const gui = new GUI();
 
+    gui.close();
+
     $('main').append(gui.domElement);
     gui.domElement.style.position = 'absolute';
     gui.domElement.style.right = 0;
