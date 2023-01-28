@@ -1,8 +1,6 @@
 import "https://code.jquery.com/jquery-3.6.3.min.js"
 import AnalyticSignal from "./module/analytic-signal.mjs"
 
-globalThis.AudioContext = globalThis.AudioContext || globalThis.webkitAudioContext || globalThis.mozAudioContext || globalThis.msAudioContext
-
 const stageElm = document.querySelector("[data-js-canvas]")
 const videoElm = document.querySelector("[data-js-video]")
 const btnPlayElm = document.querySelector("[data-js-btn-play]")
