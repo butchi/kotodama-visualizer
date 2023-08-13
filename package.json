@@ -3,7 +3,7 @@
   "version": "0.3.2",
   "description": "Kotodama visualizer.",
   "engines": {
-    "node": "18.12.1"
+    "node": ">= 18.12.1"
   },
   "scripts": {
     "start": "http-server docs"
