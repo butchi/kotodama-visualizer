@@ -1,4 +1,6 @@
-{
+// JSONファイルがiOS Chromeで読み込めなかったのでモジュール化
+
+const colorTheme = {
     "kotodama": {
         "bgColor": "#ffffff",
         "freqSync": false,
@@ -89,3 +91,5 @@
         "pointColor": "#524362"
     }
 }
+
+export default colorTheme
