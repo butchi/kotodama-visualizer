@@ -5,8 +5,6 @@ const stageElm = document.querySelector("[data-js-canvas]")
 const videoElm = document.querySelector("[data-js-video]")
 const btnPlayElm = document.querySelector("[data-js-btn-play]")
 
-let timeDomainData
-
 let cnt = 0
 
 $(globalThis).on("resize", _ => {
@@ -32,7 +30,6 @@ async function initializeWithUserMedia(constraints) {
         const audioElm = document.querySelector("[data-js-output]")
 
         audioElm.srcObject = stream
-        audioElm.volume = 0
         const audioContext = new AudioContext()
         const mediastreamsource = audioContext.createMediaStreamSource(stream)
         const analyser = audioContext.createAnalyser()
