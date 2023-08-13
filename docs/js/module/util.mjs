@@ -27,36 +27,38 @@ export const getHsvColor = (hue = 0, saturation = 1, brightness = 0.5) => {
   return chroma.hsl(h, s, v)
 }
 
-// export const generateLines = ptArr => {
-//   return ptArr.reduce((txt, pt, i, arr) => {
-//     if (i > 0) {
-//       const prevPt = arr[i - 1]
-//       return txt + `<line x1="${prevPt.x}" y1="${prevPt.y}" x2="${pt.x}" y2="${pt.y}"></line>`
-//     }
+export const generateLineArray = (ptArr, optArr = { stroke: "black", strokeWidth: 1 }) => {
+  const { stroke, strokeWidth } = optArr
 
-//     return ""
-//   })
-// }
+  return ptArr.reduce((txt, pt, i, arr) => {
+    if (i > 0) {
+      const prevPt = arr[i - 1]
+      return txt + `<line x1="${prevPt.x}" y1="${prevPt.y}" x2="${pt.x}" y2="${pt.y}" stroke="${stroke}" stroke-width="${strokeWidth}"></line>`
+    }
 
-// export const generatePolygons = (ptArr, opacity = 1) => {
-//   return ptArr.reduce((txt, pt, i, arr) => {
-//     if (i > 0) {
-//       const prevPt = arr[i - 1]
-//       return txt + `<polygon points="${width / 2},${height / 2} ${prevPt.x},${prevPt.y} ${pt.x},${pt.y}" fill="${getHexString(pt.hue)}" fill-opacity="${opacity}"></polygon>`
-//     }
+    return ""
+  }, "")
+}
 
-//     return ""
-//   }, "")
-// }
+export const generatePolygonArray = (ptArr, optArr = { opacity: 1 }) => {
+  return ptArr.reduce((txt, pt, i, arr) => {
+    if (i > 0) {
+      const prevPt = arr[i - 1]
+      return txt + `<polygon points="0,0 ${prevPt.x},${prevPt.y} ${pt.x},${pt.y}" fill="${getHsvColor(pt.hue)}" fill-opacity="${opacity}"></polygon>`
+    }
 
-// export const generateCircles = ptArr => {
-//   return ptArr.reduce((txt, pt) => {
-//     return txt + `<circle cx="${pt.x}" cy="${pt.y}" r=".5"></circle>`
-//   }, "")
-// }
+    return ""
+  }, "")
+}
 
-// export const generatePolylinePoints = ptArr => {
-//   return ptArr.reduce((txt, pt) => {
-//     return txt + `${pt.x} ${pt.y} `
-//   }, "")
-// }
+export const generateCircleArray = ptArr => {
+  return ptArr.reduce((txt, pt) => {
+    return txt + `<circle cx="${pt.x}" cy="${pt.y}" r=".5"></circle>`
+  }, "")
+}
+
+export const generatePolylinePointArray = ptArr => {
+  return ptArr.reduce((txt, pt) => {
+    return txt + `${pt.x} ${pt.y} `
+  }, "")
+}

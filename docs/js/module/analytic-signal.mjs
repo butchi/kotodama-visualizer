@@ -1,7 +1,7 @@
 import "https://code.jquery.com/jquery-3.6.3.min.js"
 import "https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
 import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.17/+esm"
-import { inv, maxIndexOf, mod, norm, getHsvColor } from "./util.mjs"
+import { inv, maxIndexOf, mod, norm, getHsvColor, generateLineArray } from "./util.mjs"
 import colorTheme from "./color-theme.js"
 
 const paramDefault = {
@@ -22,7 +22,7 @@ const paramDefault = {
   pointColor: "#000000",
   pointAlpha: 0.5,
   normalize: false,
-  output: "canvas",
+  output: "svg",
   pip: false,
 }
 
@@ -101,13 +101,22 @@ export default class AnalyticSignal {
       gui.add(param, "pointAlpha", 0, 1, 0.01),
       gui.add(param, "pointSize", 0, 9, 0.01),
       gui.add(param, "normalize"),
-      gui.add(param, "output", ["canvas", "video"]).onChange(val => {
+      gui.add(param, "output", ["canvas", "svg", "video"]).onChange(val => {
         if (val === "") {
         } else if (val === "canvas") {
+          this.svgElm.style.visibility = "hidden"
           this.videoElm.style.visibility = "hidden"
-          this.stageElm.style.visibility = "visible"
+
+          this.canvasElm.style.visibility = "visible"
+        } else if (val === "svg") {
+          this.canvasElm.style.visibility = "hidden"
+          this.videoElm.style.visibility = "hidden"
+
+          this.svgElm.style.visibility = "visible"
         } else if (val === "video") {
-          this.stageElm.style.visibility = "hidden"
+          this.svgElm.style.visibility = "hidden"
+          this.canvasElm.style.visibility = "hidden"
+
           this.videoElm.style.visibility = "visible"
         }
       }),
@@ -120,12 +129,18 @@ export default class AnalyticSignal {
       })
     ]
 
-    this.stageElm = opts.stageElm
+    this.canvasElm = opts.canvasElm
+
+    this.svgElm = opts.svgElm
+
+    this.gElm = document.createElementNS("http://www.w3.org/2000/svg", "g")
+
+    this.svgElm.appendChild(this.gElm)
 
     this.fftSize = opts.fftSize
     this.sampleRate = opts.sampleRate
 
-    this.context = this.stageElm.getContext("2d")
+    this.context = this.canvasElm.getContext("2d")
 
     this.consoleElm = document.querySelector(".console")
     this.voicedFlag = false
@@ -133,7 +148,7 @@ export default class AnalyticSignal {
     this.pointElm = document.querySelector(".point")
 
     this.videoElm = document.querySelector("video")
-    var stream = this.stageElm.captureStream(30)
+    var stream = this.canvasElm.captureStream(30)
     this.videoElm.srcObject = stream
     this.videoElm.play()
   }
@@ -178,6 +193,8 @@ export default class AnalyticSignal {
 
     context.fillStyle = param.bgColor
     context.fillRect(0, 0, width, height)
+
+    this.svgElm.innerHTML = ""
 
     // const lenNum = ptArr.reduce((p, c, i, arr) => {
     //   const len = Math.sqrt((arr[i].re - (arr[i - 1] || {}).re) ** 2 + (arr[i].im - (arr[i - 1] || {}).im) ** 2) || 0
@@ -245,6 +262,10 @@ export default class AnalyticSignal {
         } else {
           context.moveTo(pt.x, pt.y)
         }
+
+        // const lineElm = generateLineArray([prev, pt])
+
+        // this.gElm.innerHTML += lineElm
 
         prev.x = pt.x
         prev.y = pt.y

@@ -1,18 +1,19 @@
 import "https://code.jquery.com/jquery-3.6.3.min.js"
 import AnalyticSignal from "./module/analytic-signal.mjs"
 
-const stageElm = document.querySelector("[data-js-canvas]")
+const canvasElm = document.querySelector("[data-js-canvas]")
+const svgElm = document.querySelector("[data-js-svg]")
 const videoElm = document.querySelector("[data-js-video]")
 const btnPlayElm = document.querySelector("[data-js-btn-play]")
 
 let cnt = 0
 
 $(globalThis).on("resize", _ => {
-    stageElm.width = $(globalThis).width()
-    stageElm.height = $(globalThis).height()
+    canvasElm.width = $(globalThis).width()
+    canvasElm.height = $(globalThis).height()
     videoElm.width = $(globalThis).width()
     videoElm.height = $(globalThis).height()
-    stageElm.style.visibility = "visible"
+    svgElm.style.visibility = "visible"
 }).trigger("resize")
 
 async function initializeWithUserMedia(constraints) {
@@ -41,7 +42,8 @@ async function initializeWithUserMedia(constraints) {
         const sampleRate = audioContext.sampleRate
 
         const analyticSignal = new AnalyticSignal({
-            stageElm,
+            canvasElm,
+            svgElm,
             fftSize,
             sampleRate,
         })
@@ -68,8 +70,6 @@ async function initializeWithUserMedia(constraints) {
 
 const initializeWithAudio = ({ audioName }) => {
     const url = `audio/${audioName}.mp3`
-
-    const stageElm = document.querySelector("canvas")
 
     let frequencyData
     let timeDomainData
@@ -98,7 +98,8 @@ const initializeWithAudio = ({ audioName }) => {
         const sampleRate = audioContext.sampleRate
 
         const analyticSignal = new AnalyticSignal({
-            stageElm,
+            canvasElm,
+            svgElm,
             fftSize,
             sampleRate,
         })
